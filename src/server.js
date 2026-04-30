@@ -11,15 +11,38 @@ const hasResendApiKey =
   resendApiKey && !resendApiKey.includes('your_api_key_here');
 const resend = hasResendApiKey ? new Resend(resendApiKey) : null;
 
-// const defaultClientOrigins = [
-//   'http://localhost:5173',
-//   'http://localhost:5174',
-//   'https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app',
-// ];
-const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultClientOrigins.join(','))
+const defaultClientOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app',
+];
+
+function normalizeOrigin(origin) {
+  return origin.trim().replace(/\/+$/, '');
+}
+
+const configuredClientOrigins = (process.env.CLIENT_ORIGIN || '')
   .split(',')
-  .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
+const allowedOrigins = new Set([
+  ...defaultClientOrigins.map(normalizeOrigin),
+  ...configuredClientOrigins,
+]);
+
+function isAllowedOrigin(origin) {
+  if (!origin) {
+    return true;
+  }
+
+  const normalizedOrigin = normalizeOrigin(origin);
+
+  return (
+    allowedOrigins.has('*') ||
+    allowedOrigins.has(normalizedOrigin) ||
+    /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin)
+  );
+}
 
 const contactToEmail = process.env.CONTACT_TO_EMAIL || 'acnwa1234@gmail.com';
 const resendFromEmail =
@@ -35,7 +58,7 @@ app.set('trust proxy', 1);
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
         return;
       }
