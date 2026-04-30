@@ -11,11 +11,11 @@ const hasResendApiKey =
   resendApiKey && !resendApiKey.includes('your_api_key_here');
 const resend = hasResendApiKey ? new Resend(resendApiKey) : null;
 
-const defaultClientOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app',
-];
+// const defaultClientOrigins = [
+//   'http://localhost:5173',
+//   'http://localhost:5174',
+//   'https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app',
+// ];
 const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultClientOrigins.join(','))
   .split(',')
   .map((origin) => origin.trim())
