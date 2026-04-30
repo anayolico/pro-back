@@ -26,7 +26,7 @@ Create a Render Web Service with these settings:
 
 Set these environment variables in Render:
 
-- `CLIENT_ORIGIN`: your frontend URL, for example `https://your-portfolio.onrender.com`
+- `CLIENT_ORIGIN`: your frontend URL, for example `https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app`
 - `RESEND_API_KEY`: your real Resend API key
 - `RESEND_FROM_EMAIL`: your verified sender, for example `Portfolio Contact <hello@yourdomain.com>`
 - `CONTACT_TO_EMAIL`: the inbox that should receive contact messages
