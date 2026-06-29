@@ -1,0 +1,11 @@
+{
+  "kind": "collectionType",
+  "collectionName": "strengths",
+  "info": { "singularName": "strength", "pluralName": "strengths", "displayName": "Strength" },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "desc": { "type": "text" },
+    "dot": { "type": "string" }
+  }
+}

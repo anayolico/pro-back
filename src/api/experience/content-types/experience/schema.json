@@ -1,0 +1,13 @@
+{
+  "kind": "collectionType",
+  "collectionName": "experiences",
+  "info": { "singularName": "experience", "pluralName": "experiences", "displayName": "Experience" },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "period": { "type": "string", "required": true },
+    "role": { "type": "string", "required": true },
+    "description": { "type": "text" },
+    "dotColor": { "type": "string" },
+    "textColor": { "type": "string" }
+  }
+}

@@ -1,32 +1,61 @@
-# Portfolio Backend
+# 🚀 Getting started with Strapi
 
-Small Express backend for the portfolio contact form. It sends messages with Resend.
+Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
 
-## Setup
+### `develop`
 
-```bash
-cd backend
-npm install
-copy .env.example .env
-npm run dev
+Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+
+```
+npm run develop
+# or
+yarn develop
 ```
 
-Update `.env` with your real Resend API key before sending email.
+### `start`
 
-For production, use a verified sender domain in `RESEND_FROM_EMAIL`.
+Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
 
-## Render deploy
+```
+npm run start
+# or
+yarn start
+```
 
-Create a Render Web Service with these settings:
+### `build`
 
-- Runtime: `Node`
-- Build Command: `npm install`
-- Start Command: `npm start`
-- Health Check Path: `/api/health`
+Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
 
-Set these environment variables in Render:
+```
+npm run build
+# or
+yarn build
+```
 
-- `CLIENT_ORIGIN`: your frontend URL, for example `https://my-portfolio-beryl-two-rfjdabbgrm.vercel.app`
-- `RESEND_API_KEY`: your real Resend API key
-- `RESEND_FROM_EMAIL`: your verified sender, for example `Portfolio Contact <hello@yourdomain.com>`
-- `CONTACT_TO_EMAIL`: the inbox that should receive contact messages
+## ⚙️ Deployment
+
+Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+
+```
+yarn strapi deploy
+```
+
+## 📚 Learn more
+
+- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
+- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
+- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
+- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
+- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
+
+Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
+
+## ✨ Community
+
+- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
+- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
+- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
+
+---
+
+<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
