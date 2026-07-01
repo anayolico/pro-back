@@ -1,5 +1,42 @@
 'use strict';
 
+const dns = require('dns');
+// Use Google DNS for resolving to bypass the broken system DNS that causes EAI_AGAIN
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+const originalLookup = dns.lookup;
+dns.lookup = function(hostname, options, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  }
+  
+  // Use resolve4 for Cloudinary and Neon to bypass OS getaddrinfo
+  if (hostname.includes('cloudinary.com') || hostname.includes('neon.tech')) {
+    dns.resolve4(hostname, (err, addresses) => {
+      if (err || !addresses || addresses.length === 0) {
+        return originalLookup(hostname, options, callback);
+      }
+      if (options && options.all) {
+        callback(null, addresses.map(addr => ({ address: addr, family: 4 })));
+      } else {
+        callback(null, addresses[0], 4);
+      }
+    });
+    return;
+  }
+  
+  originalLookup(hostname, options, callback);
+};
+
+// Prevent the server from crashing entirely if an upload stream throws an unhandled socket error
+process.on('uncaughtException', (err) => {
+  console.error('[Uncaught Exception]', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Unhandled Rejection]', reason);
+});
+
 module.exports = {
   register(/*{ strapi }*/) {},
 

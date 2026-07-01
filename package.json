@@ -7,9 +7,9 @@
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",
-    "dev": "strapi develop",
-    "develop": "strapi develop",
-    "start": "strapi start",
+    "dev": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first strapi develop",
+    "develop": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first strapi develop",
+    "start": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
@@ -35,5 +35,8 @@
   "strapi": {
     "uuid": "5320234e-db9f-4240-b4b0-16a8cba5e4c2",
     "installId": "7d3e70293278371e98291c0b8f867fb5d8486e594b4a03ad85e78b506fa2148b"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }
