@@ -23,8 +23,8 @@ module.exports = [
         'http://localhost:5173',
         'http://localhost:3000',
         'http://127.0.0.1:5173',
-        // Add your deployed frontend URL here when you go live, e.g.:
-        // 'https://your-portfolio.vercel.app',
+        'https://www.anayolico.name.ng',
+        'https://anayolico.name.ng',
       ],
     },
   },
