@@ -72,6 +72,16 @@ const healthHandler = (req, res) => {
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
+// Root route (for Render load balancer pings and direct URL visits)
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚀 Portfolio Backend API is Live & Running!',
+    status: 'ok',
+    admin: `${req.protocol}://${req.get('host')}/admin`,
+    health: `${req.protocol}://${req.get('host')}/health`
+  });
+});
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/upload', uploadRouter);
