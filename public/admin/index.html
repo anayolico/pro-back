@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anayolico | Portfolio Admin Dashboard</title>
+  <!-- Google Fonts & Tailwind CSS CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { dark: '#080c14', card: 'rgba(15, 22, 36, 0.75)', border: 'rgba(255, 255, 255, 0.08)' },
+            accent: { teal: '#0d9488', purple: '#8b5cf6', cyan: '#06b6d4', rose: '#f43f5e' }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: #080c14;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(13, 148, 136, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.18) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: #f3f4f6;
+    }
+    .glass-card {
+      background: rgba(15, 22, 36, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(13, 148, 136, 0.3);
+      box-shadow: 0 20px 40px -10px rgba(13, 148, 136, 0.15);
+    }
+    .glass-input {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .glass-input:focus {
+      border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+    }
+    /* Toast Animations */
+    @keyframes slideInRight {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+    .toast-anim {
+      animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .toast-exit {
+      animation: fadeOut 0.3s ease forwards;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-accent-teal selection:text-white relative">
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- TOP RESPONSIVE HEADER -->
+  <header class="border-b border-white/10 glass-card sticky top-0 z-40 px-4 md:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-teal to-accent-purple flex items-center justify-center text-white font-display font-black text-xl shadow-lg shadow-accent-teal/20">
+        A
+      </div>
+      <div>
+        <h1 class="font-display font-bold text-base md:text-lg text-white leading-tight">Anayolico Admin</h1>
+        <p class="text-[11px] text-gray-400 font-medium">Portfolio Management Dashboard</p>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-2 md:gap-4">
+      <span id="dbStatus" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="hidden sm:inline">Backend</span> Connected
+      </span>
+
+      <!-- Logout Button (Desktop) -->
+      <button id="logoutBtn" onclick="logout()" class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold transition-all cursor-pointer">
+        Logout
+      </button>
+
+      <!-- Mobile Menu Toggle Button -->
+      <button id="mobileNavToggle" onclick="toggleMobileNav()" class="md:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white cursor-pointer">
+        <svg id="hamburgerIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION DRAWER (NO EMOJIS) -->
+  <div id="mobileDrawer" class="hidden md:hidden fixed inset-x-0 top-[65px] z-30 glass-card border-b border-white/10 p-4 space-y-3 shadow-2xl">
+    <div class="grid grid-cols-2 gap-2">
+      <button onclick="switchTab('projects'); toggleMobileNav();" id="mob-tab-projects" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-accent-teal text-white flex items-center justify-between">
+        <span>Projects</span>
+        <span id="mob-count-projects" class="px-2 py-0.5 rounded-full bg-black/20 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('skills'); toggleMobileNav();" id="mob-tab-skills" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+        <span>Skills</span>
+        <span id="mob-count-skills" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('experiences'); toggleMobileNav();" id="mob-tab-experiences" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+        <span>Experience</span>
+        <span id="mob-count-experiences" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('strengths'); toggleMobileNav();" id="mob-tab-strengths" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+        <span>Strengths</span>
+        <span id="mob-count-strengths" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+    </div>
+    <button onclick="switchTab('contacts'); toggleMobileNav();" id="mob-tab-contacts" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+      <span>Contact Messages</span>
+      <span id="mob-count-contacts" class="px-2.5 py-0.5 rounded-full bg-accent-purple/20 text-accent-purple border border-accent-purple/30 text-[10px]">0</span>
+    </button>
+    <button onclick="switchTab('cv'); toggleMobileNav();" id="mob-tab-cv" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+      <span>CV / Resume</span>
+    </button>
+    <div class="pt-2 border-t border-white/10 flex justify-between items-center">
+      <span class="text-[11px] text-gray-400 font-semibold">Log Out Session</span>
+      <button onclick="logout()" class="px-4 py-2 rounded-xl bg-rose-500/10 text-rose-400 text-xs font-bold">Logout</button>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginView" class="flex-1 flex items-center justify-center p-4 md:p-6">
+    <div class="glass-card p-6 md:p-8 rounded-3xl max-w-md w-full space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-teal to-accent-purple flex items-center justify-center text-white font-display font-black text-2xl mx-auto shadow-xl shadow-accent-teal/20">
+          A
+        </div>
+        <h2 class="text-2xl font-bold font-display text-white">Welcome Back</h2>
+        <p class="text-xs text-gray-400">Sign in to manage portfolio content from phone or desktop</p>
+      </div>
+
+      <div id="loginError" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-center font-medium"></div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div class="space-y-1">
+          <label class="text-[11px] uppercase tracking-wider font-bold text-gray-400">Username</label>
+          <input id="loginUsername" type="text" placeholder="Enter admin username" required class="w-full px-4 py-3 rounded-xl glass-input text-sm">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[11px] uppercase tracking-wider font-bold text-gray-400">Password</label>
+          <input id="loginPassword" type="password" placeholder="Enter password" required class="w-full px-4 py-3 rounded-xl glass-input text-sm">
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-accent-teal to-accent-purple text-white font-bold shadow-lg shadow-accent-teal/25 hover:brightness-110 active:scale-[0.98] transition-all text-sm cursor-pointer">
+          Sign In to Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD MAIN VIEW -->
+  <main id="dashboardView" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+    
+    <!-- DASHBOARD STATS BANNER (NO EMOJIS) -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+      <div class="glass-card p-4 rounded-2xl space-y-1">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Projects</span>
+        <div class="flex justify-between items-baseline pt-1">
+          <span id="stat-projects" class="text-2xl md:text-3xl font-extrabold font-display text-white">0</span>
+          <span class="text-accent-teal text-xs font-bold uppercase tracking-widest">Active</span>
+        </div>
+      </div>
+      <div class="glass-card p-4 rounded-2xl space-y-1">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Skills</span>
+        <div class="flex justify-between items-baseline pt-1">
+          <span id="stat-skills" class="text-2xl md:text-3xl font-extrabold font-display text-white">0</span>
+          <span class="text-accent-purple text-xs font-bold uppercase tracking-widest">Stack</span>
+        </div>
+      </div>
+      <div class="glass-card p-4 rounded-2xl space-y-1">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Experiences</span>
+        <div class="flex justify-between items-baseline pt-1">
+          <span id="stat-experiences" class="text-2xl md:text-3xl font-extrabold font-display text-white">0</span>
+          <span class="text-accent-cyan text-xs font-bold uppercase tracking-widest">Entries</span>
+        </div>
+      </div>
+      <div class="glass-card p-4 rounded-2xl space-y-1">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Strengths</span>
+        <div class="flex justify-between items-baseline pt-1">
+          <span id="stat-strengths" class="text-2xl md:text-3xl font-extrabold font-display text-white">0</span>
+          <span class="text-amber-400 text-xs font-bold uppercase tracking-widest">Core</span>
+        </div>
+      </div>
+      <div class="col-span-2 md:col-span-1 glass-card p-4 rounded-2xl space-y-1">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider">Messages</span>
+        <div class="flex justify-between items-baseline pt-1">
+          <span id="stat-contacts" class="text-2xl md:text-3xl font-extrabold font-display text-accent-teal">0</span>
+          <span class="text-accent-rose text-xs font-bold uppercase tracking-widest">Inbox</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP NAVIGATION TABS (NO EMOJIS) -->
+    <div class="hidden md:flex flex-wrap gap-2 border-b border-white/10 pb-4">
+      <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-accent-teal text-white shadow-md flex items-center gap-2 cursor-pointer">
+        <span>Projects</span>
+        <span id="tab-count-projects" class="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('skills')" id="tab-skills" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        <span>Skills</span>
+        <span id="tab-count-skills" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('experiences')" id="tab-experiences" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        <span>Experience</span>
+        <span id="tab-count-experiences" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('strengths')" id="tab-strengths" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        <span>Strengths</span>
+        <span id="tab-count-strengths" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('contacts')" id="tab-contacts" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        <span>Messages Inbox</span>
+        <span id="inboxCount" class="px-2.5 py-0.5 rounded-full bg-accent-teal/20 text-accent-teal border border-accent-teal/30 text-[10px]">0</span>
+      </button>
+      <button onclick="switchTab('cv')" id="tab-cv" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        <span>CV / Resume</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: PROJECTS -->
+    <section id="section-projects" class="tab-section space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Portfolio Projects</h2>
+          <p class="text-xs text-gray-400">Add, edit, or remove showcased projects</p>
+        </div>
+        <button onclick="openModal('projectModal')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Add New Project</span>
+        </button>
+      </div>
+
+      <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- TAB 2: SKILLS -->
+    <section id="section-skills" class="tab-section hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Skills & Proficiencies</h2>
+          <p class="text-xs text-gray-400">Manage technical stack categories and proficiency ratings</p>
+        </div>
+        <button onclick="openModal('skillModal')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Add Skill</span>
+        </button>
+      </div>
+
+      <div id="skillsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- TAB 3: EXPERIENCES -->
+    <section id="section-experiences" class="tab-section hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Work Experience</h2>
+          <p class="text-xs text-gray-400">Manage timeline career entries</p>
+        </div>
+        <button onclick="openModal('experienceModal')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Add Experience</span>
+        </button>
+      </div>
+
+      <div id="experiencesList" class="space-y-4"></div>
+    </section>
+
+    <!-- TAB 4: STRENGTHS -->
+    <section id="section-strengths" class="tab-section hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Core Strengths</h2>
+          <p class="text-xs text-gray-400">Manage highlights and value propositions</p>
+        </div>
+        <button onclick="openModal('strengthModal')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Add Strength</span>
+        </button>
+      </div>
+
+      <div id="strengthsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+    </section>
+
+    <!-- TAB 5: CONTACT MESSAGES -->
+    <section id="section-contacts" class="tab-section hidden space-y-6">
+      <div>
+        <h2 class="text-xl font-bold font-display text-white">Contact Form Messages</h2>
+        <p class="text-xs text-gray-400">Received inquiries from your portfolio website</p>
+      </div>
+
+      <div id="contactsList" class="space-y-4"></div>
+    </section>
+
+    <!-- TAB 6: CV / RESUME -->
+    <section id="section-cv" class="tab-section hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Curriculum Vitae (CV) & Resume</h2>
+          <p class="text-xs text-gray-400">Manage professional summary, contact details, skills, and experience for your /cv page</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <a href="/cv" target="_blank" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
+            <span>View Live /cv Page</span>
+          </a>
+          <button onclick="saveCv(event)" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 transition-all cursor-pointer">
+            <span>Save CV Changes</span>
+          </button>
+        </div>
+      </div>
+
+      <form id="cvForm" onsubmit="saveCv(event)" class="glass-card p-6 rounded-3xl space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Full Name</label>
+            <input id="cvFullName" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Professional Title</label>
+            <input id="cvTitle" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Location</label>
+            <input id="cvLocation" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Phone Number</label>
+            <input id="cvPhone" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Email Address</label>
+            <input id="cvEmail" type="email" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">Portfolio Domain</label>
+            <input id="cvPortfolio" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">GitHub Profile URL</label>
+          <input id="cvGithub" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">Professional Summary</label>
+          <textarea id="cvSummary" required class="w-full p-3 rounded-xl glass-input text-xs h-32 leading-relaxed"></textarea>
+        </div>
+
+        <!-- INTERACTIVE CV BUILDER MANAGERS -->
+        <div class="space-y-8 pt-6 border-t border-white/10">
+          
+          <!-- 1. SKILLS GROUPS MANAGER -->
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-accent-teal uppercase tracking-wider font-display">1. Skills Groups</h3>
+                <p class="text-[11px] text-gray-400">Manage technical skill categories and tags for your CV</p>
+              </div>
+              <button type="button" onclick="addCvSkillGroup()" class="px-4 py-2 rounded-xl bg-accent-teal/20 hover:bg-accent-teal/30 text-accent-teal border border-accent-teal/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                <span>+ Add Skill Group</span>
+              </button>
+            </div>
+            <div id="cvSkillsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+
+          <!-- 2. HACKATHON AWARD PROJECT SHOWCASE (SPECIAL) -->
+          <div class="space-y-4 pt-4 border-t border-white/10">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider font-display">🏆 Special Hackathon Award Project</h3>
+                <p class="text-[11px] text-gray-400">Featured award-winning hackathon project & square trophy photo slot</p>
+              </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl space-y-4 border border-amber-400/20">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase">Project Title</label>
+                  <input id="hackathonTitle" type="text" placeholder="Nigeria SecureVote" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-amber-400 uppercase">Award Distinction</label>
+                  <input id="hackathonAwardTitle" type="text" placeholder="1st Place Hackathon Winner & Best Security Architecture" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-400">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase">Your Role</label>
+                  <input id="hackathonRole" type="text" placeholder="Lead Architect & Full-Stack Developer" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-purple font-semibold">
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase">GitHub Repository URL</label>
+                  <input id="hackathonCodeLink" type="text" placeholder="https://github.com/anayolico/onetime" class="w-full px-3 py-2 rounded-xl glass-input text-xs">
+                </div>
+              </div>
+
+              <!-- Square Award Image Upload -->
+              <div class="space-y-2 pt-2 border-t border-white/5">
+                <label class="text-[10px] font-bold text-amber-400 uppercase">Award Trophy / Certificate Picture (Square Format)</label>
+                <div class="flex items-center gap-3">
+                  <div class="w-24 h-24 rounded-2xl bg-black/40 border border-amber-400/30 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
+                    <img id="hackathonAwardImagePreview" src="" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden'); document.getElementById('hackathonAwardPlaceholder').classList.remove('hidden');">
+                    <span id="hackathonAwardPlaceholder" class="text-[9px] text-amber-400/70 text-center px-1 font-bold">Square Award Photo</span>
+                  </div>
+                  <div class="flex-1 space-y-2">
+                    <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-400 border border-amber-400/30 text-xs font-bold transition-all w-full text-center">
+                      <span>Upload Award Photo to Cloudinary</span>
+                      <input type="file" id="hackathonFileInput" accept="image/*" onchange="uploadHackathonAwardImage(event)" class="hidden">
+                    </label>
+                    <input id="hackathonAwardImage" type="text" placeholder="Award Image URL (Paste URL or Upload above)" oninput="updateHackathonImagePreview(this.value)" class="w-full p-2.5 rounded-xl glass-input text-xs">
+                    <div id="hackathonUploadProgress" class="hidden text-[11px] text-amber-400 animate-pulse font-bold">Uploading Award Photo...</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Project Overview Summary</label>
+                <textarea id="hackathonSummary" placeholder="Summary..." class="w-full p-3 rounded-xl glass-input text-xs h-20 leading-relaxed"></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-[10px] font-bold text-amber-400 uppercase">Key Technical Features & Security Highlights</label>
+                <div id="hackathonFeaturesContainer" class="space-y-2"></div>
+                <div class="flex gap-2 pt-1">
+                  <input type="text" id="newHackathonFeature" placeholder="Add technical highlight (e.g. NIMC NIN integration)..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addHackathonFeature();}" class="flex-1 px-3 py-2 rounded-xl glass-input text-xs">
+                  <button type="button" onclick="addHackathonFeature()" class="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-bold cursor-pointer">+ Add Highlight</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. PROJECTS SHOWCASE MANAGER -->
+          <div class="space-y-4 pt-4 border-t border-white/10">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-accent-purple uppercase tracking-wider font-display">3. Projects Showcase</h3>
+                <p class="text-[11px] text-gray-400">Manage featured projects and accomplishment bullet points</p>
+              </div>
+              <button type="button" onclick="addCvProject()" class="px-4 py-2 rounded-xl bg-accent-purple/20 hover:bg-accent-purple/30 text-accent-purple border border-accent-purple/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                <span>+ Add Showcase Project</span>
+              </button>
+            </div>
+            <div id="cvProjectsContainer" class="space-y-4"></div>
+          </div>
+
+          <!-- 3. WORK EXPERIENCE TIMELINE MANAGER -->
+          <div class="space-y-4 pt-4 border-t border-white/10">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-accent-cyan uppercase tracking-wider font-display">3. Work Experience Timeline</h3>
+                <p class="text-[11px] text-gray-400">Manage career positions, companies, dates, and bullet achievements</p>
+              </div>
+              <button type="button" onclick="addCvExperience()" class="px-4 py-2 rounded-xl bg-accent-cyan/20 hover:bg-accent-cyan/30 text-accent-cyan border border-accent-cyan/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                <span>+ Add Career Experience</span>
+              </button>
+            </div>
+            <div id="cvExperienceContainer" class="space-y-4"></div>
+          </div>
+
+          <!-- 4. EDUCATION DETAILS MANAGER -->
+          <div class="space-y-4 pt-4 border-t border-white/10">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider font-display">4. Education Details</h3>
+                <p class="text-[11px] text-gray-400">Manage degree qualifications, university institutions, and study periods</p>
+              </div>
+              <button type="button" onclick="addCvEducation()" class="px-4 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-400 border border-amber-400/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                <span>+ Add Education Entry</span>
+              </button>
+            </div>
+            <div id="cvEducationContainer" class="space-y-4"></div>
+          </div>
+
+        </div>
+
+        <div id="cvSaveStatus" class="hidden p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs text-center font-bold"></div>
+
+        <div class="flex justify-end pt-3">
+          <button type="submit" class="px-7 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:brightness-110 transition-all cursor-pointer">
+            Save & Publish CV Changes
+          </button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- MODALS -->
+  <!-- Project Modal -->
+  <div id="projectModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card p-6 rounded-3xl max-w-lg w-full space-y-4 my-auto">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 id="projectModalTitle" class="text-lg font-bold font-display text-white">Add Project</h3>
+        <button type="button" onclick="closeModal('projectModal')" class="text-gray-400 hover:text-white text-sm p-1 cursor-pointer">Close</button>
+      </div>
+      <form onsubmit="saveProject(event)" class="space-y-4">
+        <input type="hidden" id="projId">
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">Project Title</label>
+          <input id="projTitle" type="text" placeholder="Project Title" required class="w-full p-3 rounded-xl glass-input text-xs">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">Description</label>
+          <textarea id="projDesc" placeholder="Description" required class="w-full p-3 rounded-xl glass-input text-xs h-24"></textarea>
+        </div>
+        
+        <!-- Image Upload Section -->
+        <div class="space-y-2">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">Project Image</label>
+          <div class="flex items-center gap-3">
+            <div id="projImagePreviewContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center flex-shrink-0">
+              <img id="projImagePreview" src="" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden'); document.getElementById('projImagePlaceholder').classList.remove('hidden');">
+              <span id="projImagePlaceholder" class="text-[10px] text-gray-500 text-center px-1">No Image</span>
+            </div>
+            <div class="flex-1 space-y-1">
+              <label class="cursor-pointer inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-accent-teal/20 hover:bg-accent-teal/30 text-accent-teal border border-accent-teal/30 text-xs font-bold transition-all w-full text-center">
+                <span>Upload Image to Cloudinary</span>
+                <input type="file" id="projFileInput" accept="image/*" onchange="uploadImageToCloudinary(event)" class="hidden">
+              </label>
+              <div id="uploadProgress" class="hidden text-[11px] text-accent-cyan animate-pulse">Uploading to Cloudinary...</div>
+            </div>
+          </div>
+          <input id="projImage" type="text" placeholder="Image URL (Auto-filled via upload or paste URL)" required class="w-full p-3 rounded-xl glass-input text-xs" oninput="updateImagePreview(this.value)">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-gray-400 uppercase">Tech Stack (comma separated)</label>
+          <input id="projTech" type="text" placeholder="React, Node.js, Tailwind" required class="w-full p-3 rounded-xl glass-input text-xs">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input id="projDemo" type="text" placeholder="Live Demo URL" class="w-full p-3 rounded-xl glass-input text-xs">
+          <input id="projCode" type="text" placeholder="GitHub Repository URL" class="w-full p-3 rounded-xl glass-input text-xs">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <button type="button" onclick="closeModal('projectModal')" class="px-5 py-2.5 rounded-xl border border-white/10 text-gray-400 text-xs font-semibold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/20 cursor-pointer">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Skill Modal -->
+  <div id="skillModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card p-6 rounded-3xl max-w-md w-full space-y-4 my-auto">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 id="skillModalTitle" class="text-lg font-bold font-display text-white">Add Skill</h3>
+        <button type="button" onclick="closeModal('skillModal')" class="text-gray-400 hover:text-white text-sm p-1 cursor-pointer">Close</button>
+      </div>
+      <form onsubmit="saveSkill(event)" class="space-y-3">
+        <input type="hidden" id="skillId">
+        <input id="skillName" type="text" placeholder="Skill Name (e.g. React.js)" required class="w-full p-3 rounded-xl glass-input text-xs">
+        <input id="skillLevel" type="number" min="1" max="100" placeholder="Proficiency % (1-100)" required class="w-full p-3 rounded-xl glass-input text-xs">
+        <select id="skillCategory" class="w-full p-3 rounded-xl glass-input text-xs bg-slate-900 text-white">
+          <option value="Frontend">Frontend</option>
+          <option value="Backend">Backend & Logic</option>
+          <option value="Tools">Developer Tools</option>
+        </select>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('skillModal')" class="px-4 py-2 rounded-xl border border-white/10 text-gray-400 text-xs font-semibold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-accent-teal text-white text-xs font-bold cursor-pointer">Save Skill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Experience Modal -->
+  <div id="experienceModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card p-6 rounded-3xl max-w-md w-full space-y-4 my-auto">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 id="expModalTitle" class="text-lg font-bold font-display text-white">Add Experience</h3>
+        <button type="button" onclick="closeModal('experienceModal')" class="text-gray-400 hover:text-white text-sm p-1 cursor-pointer">Close</button>
+      </div>
+      <form onsubmit="saveExperience(event)" class="space-y-3">
+        <input type="hidden" id="expId">
+        <input id="expPeriod" type="text" placeholder="Period (e.g. 2024 - Present)" required class="w-full p-3 rounded-xl glass-input text-xs">
+        <input id="expRole" type="text" placeholder="Role Title (e.g. Full Stack Developer)" required class="w-full p-3 rounded-xl glass-input text-xs">
+        <textarea id="expDesc" placeholder="Description" required class="w-full p-3 rounded-xl glass-input text-xs h-24"></textarea>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('experienceModal')" class="px-4 py-2 rounded-xl border border-white/10 text-gray-400 text-xs font-semibold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-accent-teal text-white text-xs font-bold cursor-pointer">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Strength Modal -->
+  <div id="strengthModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card p-6 rounded-3xl max-w-md w-full space-y-4 my-auto">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <h3 id="strModalTitle" class="text-lg font-bold font-display text-white">Add Strength</h3>
+        <button type="button" onclick="closeModal('strengthModal')" class="text-gray-400 hover:text-white text-sm p-1 cursor-pointer">Close</button>
+      </div>
+      <form onsubmit="saveStrength(event)" class="space-y-3">
+        <input type="hidden" id="strId">
+        <input id="strTitle" type="text" placeholder="Strength Title" required class="w-full p-3 rounded-xl glass-input text-xs">
+        <textarea id="strDesc" placeholder="Description" required class="w-full p-3 rounded-xl glass-input text-xs h-24"></textarea>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('strengthModal')" class="px-4 py-2 rounded-xl border border-white/10 text-gray-400 text-xs font-semibold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-accent-teal text-white text-xs font-bold cursor-pointer">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    let authToken = localStorage.getItem('adminToken');
+    let state = { projects: [], skills: [], experiences: [], strengths: [], contacts: [] };
+
+    window.onload = () => {
+      if (authToken) {
+        verifyToken();
+      } else {
+        showLogin();
+      }
+    };
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto p-4 rounded-2xl glass-card border flex items-center justify-between gap-3 shadow-2xl toast-anim ${
+        type === 'success'
+          ? 'border-emerald-500/40 bg-emerald-950/80 text-emerald-200'
+          : type === 'error'
+          ? 'border-rose-500/40 bg-rose-950/80 text-rose-200'
+          : 'border-accent-teal/40 bg-slate-900/90 text-accent-teal'
+      }`;
+
+      const iconSvg = type === 'success'
+        ? `<svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`
+        : type === 'error'
+        ? `<svg class="w-5 h-5 text-rose-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`
+        : `<svg class="w-5 h-5 text-accent-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+
+      toast.innerHTML = `
+        <div class="flex items-center gap-3">
+          ${iconSvg}
+          <span class="text-xs font-semibold leading-snug">${message}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white text-xs p-1 cursor-pointer">✕</button>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function toggleMobileNav() {
+      const drawer = document.getElementById('mobileDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function showLogin() {
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('mobileDrawer').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      loadAllData();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value;
+      const p = document.getElementById('loginPassword').value;
+      const errBox = document.getElementById('loginError');
+      errBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          authToken = data.token;
+          localStorage.setItem('adminToken', authToken);
+          showToast('Welcome back! Dashboard loaded.', 'success');
+          showDashboard();
+        } else {
+          const errMsg = data.error || 'Invalid credentials';
+          errBox.innerText = errMsg;
+          errBox.classList.remove('hidden');
+          showToast(errMsg, 'error');
+        }
+      } catch (err) {
+        const errMsg = 'Connection error. Please check backend server.';
+        errBox.innerText = errMsg;
+        errBox.classList.remove('hidden');
+        showToast(errMsg, 'error');
+      }
+    }
+
+    async function verifyToken() {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          showDashboard();
+        } else {
+          logout();
+        }
+      } catch (e) {
+        showDashboard();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('adminToken');
+      authToken = null;
+      showToast('Logged out successfully', 'info');
+      showLogin();
+    }
+
+    async function fetchApi(endpoint, method = 'GET', body = null) {
+      const headers = { 'Accept': 'application/json' };
+      if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+      if (body) headers['Content-Type'] = 'application/json';
+
+      const options = { method, headers };
+      if (body) options.body = JSON.stringify(body);
+
+      const res = await fetch(endpoint, options);
+      if (!res.ok && res.status === 401) {
+        logout();
+        throw new Error('Unauthorized');
+      }
+      return await res.json();
+    }
+
+    async function loadAllData() {
+      try {
+        const pRes = await fetchApi('/api/projects');
+        state.projects = pRes.data || [];
+        renderProjects();
+
+        const sRes = await fetchApi('/api/skills');
+        state.skills = sRes.data || [];
+        renderSkills();
+
+        const eRes = await fetchApi('/api/experiences');
+        state.experiences = eRes.data || [];
+        renderExperiences();
+
+        const stRes = await fetchApi('/api/strengths');
+        state.strengths = stRes.data || [];
+        renderStrengths();
+
+        const cRes = await fetchApi('/api/contacts');
+        state.contacts = cRes.data || [];
+        renderContacts();
+
+        await loadCvData();
+
+        updateStatCounters();
+      } catch (e) {
+        console.error('Data load error:', e);
+        showToast('Error loading dashboard data', 'error');
+      }
+    }
+
+    let cvState = { skills: [], projects: [], experience: [], education: [], hackathonProject: null };
+
+    async function loadCvData() {
+      try {
+        const cvRes = await fetchApi('/api/cv');
+        const cv = cvRes.data || cvRes;
+        if (!cv) return;
+        document.getElementById('cvFullName').value = cv.fullName || '';
+        document.getElementById('cvTitle').value = cv.title || '';
+        document.getElementById('cvLocation').value = cv.location || '';
+        document.getElementById('cvPhone').value = cv.phone || '';
+        document.getElementById('cvEmail').value = cv.email || '';
+        document.getElementById('cvPortfolio').value = cv.portfolio || '';
+        document.getElementById('cvGithub').value = cv.github || '';
+        document.getElementById('cvSummary').value = cv.summary || '';
+
+        cvState = {
+          skills: Array.isArray(cv.skills) ? cv.skills : [],
+          projects: Array.isArray(cv.projects) ? cv.projects : [],
+          experience: Array.isArray(cv.experience) ? cv.experience : [],
+          education: Array.isArray(cv.education) ? cv.education : [],
+          hackathonProject: cv.hackathonProject || {
+            title: "Nigeria SecureVote",
+            awardTitle: "1st Place Hackathon Winner & Best Security Architecture",
+            role: "Lead Architect & Full-Stack Developer",
+            awardImage: "",
+            summary: "Award-winning next-generation cryptographic E-Voting & Identity Ingestion platform engineered for secure, transparent multi-service election processing.",
+            keyFeatures: [
+              "Real-time National Identity (NIMC/NIN) verification & dynamic citizen profile ingestion via Prembly API.",
+              "PWA Offline-First Resilient Vote Queue with local cryptographic signing and auto-reconnection background sync.",
+              "WebAuthn Biometric Authorization (fingerprint / TouchID / FaceID) enforcing strict single-vote integrity.",
+              "Cryptographic Token & Digital PVC Card Generation featuring 6-digit VIN, 16-character security tokens, and QR verification.",
+              "Python FastAPI Fraud Detection Engine & Real-Time Public Transparency Audit Ledger."
+            ],
+            tech: ["React", "Vite", "Node.js", "Express", "Python (FastAPI)", "Prisma ORM", "Neon Database", "Supabase", "Prembly NIMC API", "WebAuthn Biometrics", "PWA Offline Sync"],
+            demoLink: "#",
+            codeLink: "https://github.com/anayolico/onetime"
+          }
+        };
+
+        renderCvSkills();
+        renderCvProjects();
+        renderCvExperience();
+        renderCvEducation();
+        renderHackathonProject();
+      } catch (err) {
+        console.error('Error loading CV data:', err);
+      }
+    }
+
+    function renderHackathonProject() {
+      const h = cvState.hackathonProject || {};
+      if (document.getElementById('hackathonTitle')) document.getElementById('hackathonTitle').value = h.title || '';
+      if (document.getElementById('hackathonAwardTitle')) document.getElementById('hackathonAwardTitle').value = h.awardTitle || '';
+      if (document.getElementById('hackathonRole')) document.getElementById('hackathonRole').value = h.role || '';
+      if (document.getElementById('hackathonCodeLink')) document.getElementById('hackathonCodeLink').value = h.codeLink || '';
+      if (document.getElementById('hackathonAwardImage')) document.getElementById('hackathonAwardImage').value = h.awardImage || '';
+      if (document.getElementById('hackathonSummary')) document.getElementById('hackathonSummary').value = h.summary || '';
+      updateHackathonImagePreview(h.awardImage || '');
+
+      const container = document.getElementById('hackathonFeaturesContainer');
+      if (!container) return;
+      const features = h.keyFeatures || [];
+      container.innerHTML = features.map((feat, fIdx) => `
+        <div class="flex items-start gap-2">
+          <span class="text-amber-400 pt-2 font-bold">•</span>
+          <textarea onchange="cvState.hackathonProject.keyFeatures[${fIdx}] = this.value" class="flex-1 p-2.5 rounded-xl glass-input text-xs leading-relaxed h-16">${feat}</textarea>
+          <button type="button" onclick="removeHackathonFeature(${fIdx})" class="p-2 text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function updateHackathonImagePreview(url) {
+      const img = document.getElementById('hackathonAwardImagePreview');
+      const placeholder = document.getElementById('hackathonAwardPlaceholder');
+      if (!img || !placeholder) return;
+      if (url && url.trim()) {
+        img.src = url;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.src = '';
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    async function uploadHackathonAwardImage(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const progressEl = document.getElementById('hackathonUploadProgress');
+      progressEl.innerText = 'Uploading Award Photo to Cloudinary...';
+      progressEl.classList.remove('hidden');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers,
+          body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok && data.url) {
+          document.getElementById('hackathonAwardImage').value = data.url;
+          if (!cvState.hackathonProject) cvState.hackathonProject = {};
+          cvState.hackathonProject.awardImage = data.url;
+          updateHackathonImagePreview(data.url);
+          progressEl.innerText = 'Uploaded successfully!';
+          showToast('Award photo uploaded to Cloudinary!', 'success');
+          setTimeout(() => progressEl.classList.add('hidden'), 3000);
+        } else {
+          const errMsg = data.error || 'Failed to upload award photo.';
+          showToast(errMsg, 'error');
+          progressEl.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('[Award Upload Error]', err);
+        showToast('Upload error. Check server connection.', 'error');
+        progressEl.classList.add('hidden');
+      }
+    }
+
+    function addHackathonFeature() {
+      const input = document.getElementById('newHackathonFeature');
+      if (!input) return;
+      const val = input.value.trim();
+      if (val) {
+        if (!cvState.hackathonProject.keyFeatures) cvState.hackathonProject.keyFeatures = [];
+        cvState.hackathonProject.keyFeatures.push(val);
+        input.value = '';
+        renderHackathonProject();
+      }
+    }
+
+    function removeHackathonFeature(fIdx) {
+      if (cvState.hackathonProject && cvState.hackathonProject.keyFeatures) {
+        cvState.hackathonProject.keyFeatures.splice(fIdx, 1);
+        renderHackathonProject();
+      }
+    }
+
+    async function saveCv(e) {
+      if (e) e.preventDefault();
+      const statusEl = document.getElementById('cvSaveStatus');
+      statusEl.classList.add('hidden');
+
+      try {
+        if (!cvState.hackathonProject) cvState.hackathonProject = {};
+        cvState.hackathonProject.title = document.getElementById('hackathonTitle').value;
+        cvState.hackathonProject.awardTitle = document.getElementById('hackathonAwardTitle').value;
+        cvState.hackathonProject.role = document.getElementById('hackathonRole').value;
+        cvState.hackathonProject.codeLink = document.getElementById('hackathonCodeLink').value;
+        cvState.hackathonProject.awardImage = document.getElementById('hackathonAwardImage').value;
+        cvState.hackathonProject.summary = document.getElementById('hackathonSummary').value;
+
+        const payload = {
+          fullName: document.getElementById('cvFullName').value,
+          title: document.getElementById('cvTitle').value,
+          location: document.getElementById('cvLocation').value,
+          phone: document.getElementById('cvPhone').value,
+          email: document.getElementById('cvEmail').value,
+          portfolio: document.getElementById('cvPortfolio').value,
+          github: document.getElementById('cvGithub').value,
+          summary: document.getElementById('cvSummary').value,
+          skills: cvState.skills,
+          projects: cvState.projects,
+          experience: cvState.experience,
+          education: cvState.education,
+          hackathonProject: cvState.hackathonProject
+        };
+
+        const res = await fetchApi('/api/cv', 'PUT', payload);
+        if (res && (res.success || res.fullName)) {
+          showToast('CV & Resume changes saved live!', 'success');
+          statusEl.innerText = 'CV updated successfully! Changes are live at /cv';
+          statusEl.classList.remove('hidden');
+          setTimeout(() => statusEl.classList.add('hidden'), 4000);
+        } else {
+          showToast('Failed to save CV changes', 'error');
+        }
+      } catch (err) {
+        showToast('Error saving CV data', 'error');
+      }
+    }
+
+    // --- CV INTERACTIVE MANAGERS ---
+    function renderCvSkills() {
+      const container = document.getElementById('cvSkillsContainer');
+      if (!container) return;
+      if (cvState.skills.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 col-span-2 text-center">No skill categories added yet. Click "+ Add Skill Group" to create one.</p>`;
+        return;
+      }
+      container.innerHTML = cvState.skills.map((group, groupIdx) => `
+        <div class="glass-card p-4 rounded-2xl space-y-3 relative border border-white/10">
+          <div class="flex justify-between items-center gap-2">
+            <input type="text" value="${group.category || ''}" placeholder="Category Name (e.g. Frontend)" onchange="cvState.skills[${groupIdx}].category = this.value" class="w-full px-3 py-1.5 rounded-xl glass-input text-xs font-bold text-accent-teal">
+            <button type="button" onclick="deleteCvSkillGroup(${groupIdx})" class="text-rose-400 hover:text-rose-300 text-xs font-bold px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 cursor-pointer">Delete</button>
+          </div>
+          <div class="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-black/20 rounded-xl">
+            ${(group.items || []).map((item, itemIdx) => `
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent-teal/20 text-accent-teal text-xs font-semibold border border-accent-teal/30">
+                <span>${item}</span>
+                <button type="button" onclick="removeCvSkillItem(${groupIdx}, ${itemIdx})" class="hover:text-white font-bold ml-1 cursor-pointer">✕</button>
+              </span>
+            `).join('')}
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="newSkillInput_${groupIdx}" placeholder="Add skill (e.g. React.js)" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCvSkillItem(${groupIdx});}" class="flex-1 px-3 py-1.5 rounded-xl glass-input text-xs">
+            <button type="button" onclick="addCvSkillItem(${groupIdx})" class="px-3 py-1.5 rounded-xl bg-accent-teal text-white text-xs font-bold cursor-pointer">+ Add Tag</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addCvSkillGroup() {
+      cvState.skills.push({ category: 'New Skill Category', items: [] });
+      renderCvSkills();
+    }
+
+    function deleteCvSkillGroup(groupIdx) {
+      cvState.skills.splice(groupIdx, 1);
+      renderCvSkills();
+    }
+
+    function addCvSkillItem(groupIdx) {
+      const input = document.getElementById(`newSkillInput_${groupIdx}`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (val) {
+        if (!cvState.skills[groupIdx].items) cvState.skills[groupIdx].items = [];
+        cvState.skills[groupIdx].items.push(val);
+        input.value = '';
+        renderCvSkills();
+      }
+    }
+
+    function removeCvSkillItem(groupIdx, itemIdx) {
+      cvState.skills[groupIdx].items.splice(itemIdx, 1);
+      renderCvSkills();
+    }
+
+    // --- CV PROJECTS MANAGER ---
+    function renderCvProjects() {
+      const container = document.getElementById('cvProjectsContainer');
+      if (!container) return;
+      if (cvState.projects.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No showcase projects added yet. Click "+ Add Showcase Project" above.</p>`;
+        return;
+      }
+      container.innerHTML = cvState.projects.map((proj, projIdx) => `
+        <div class="glass-card p-5 rounded-2xl space-y-4 border border-white/10">
+          <div class="flex justify-between items-center gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Project Title</label>
+                <input type="text" value="${proj.title || ''}" placeholder="Project Title" onchange="cvState.projects[${projIdx}].title = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Your Role</label>
+                <input type="text" value="${proj.role || ''}" placeholder="Role (e.g. Lead Architect & Developer)" onchange="cvState.projects[${projIdx}].role = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-purple font-semibold">
+              </div>
+            </div>
+            <button type="button" onclick="deleteCvProject(${projIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete Project</button>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase">Key Highlights / Accomplishment Bullets</label>
+            <div class="space-y-2">
+              ${(proj.bullets || []).map((bullet, bulletIdx) => `
+                <div class="flex items-start gap-2">
+                  <span class="text-accent-purple pt-2 font-bold">•</span>
+                  <textarea onchange="cvState.projects[${projIdx}].bullets[${bulletIdx}] = this.value" class="flex-1 p-2.5 rounded-xl glass-input text-xs leading-relaxed h-16">${bullet}</textarea>
+                  <button type="button" onclick="removeCvProjectBullet(${projIdx}, ${bulletIdx})" class="p-2 text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer">✕</button>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex gap-2 pt-1">
+              <input type="text" id="newProjBullet_${projIdx}" placeholder="Add new accomplishment bullet point..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addCvProjectBullet(${projIdx});}" class="flex-1 px-3 py-2 rounded-xl glass-input text-xs">
+              <button type="button" onclick="addCvProjectBullet(${projIdx})" class="px-4 py-2 rounded-xl bg-accent-purple text-white text-xs font-bold cursor-pointer">+ Add Bullet</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addCvProject() {
+      cvState.projects.push({ title: 'New Showcase Project', role: 'Full-Stack Developer', bullets: ['Built features...'] });
+      renderCvProjects();
+    }
+
+    function deleteCvProject(projIdx) {
+      cvState.projects.splice(projIdx, 1);
+      renderCvProjects();
+    }
+
+    function addCvProjectBullet(projIdx) {
+      const input = document.getElementById(`newProjBullet_${projIdx}`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (val) {
+        if (!cvState.projects[projIdx].bullets) cvState.projects[projIdx].bullets = [];
+        cvState.projects[projIdx].bullets.push(val);
+        input.value = '';
+        renderCvProjects();
+      }
+    }
+
+    function removeCvProjectBullet(projIdx, bulletIdx) {
+      cvState.projects[projIdx].bullets.splice(bulletIdx, 1);
+      renderCvProjects();
+    }
+
+    // --- CV EXPERIENCE MANAGER ---
+    function renderCvExperience() {
+      const container = document.getElementById('cvExperienceContainer');
+      if (!container) return;
+      if (cvState.experience.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No experience entries added yet. Click "+ Add Career Experience" above.</p>`;
+        return;
+      }
+      container.innerHTML = cvState.experience.map((exp, expIdx) => `
+        <div class="glass-card p-5 rounded-2xl space-y-4 border border-white/10">
+          <div class="flex justify-between items-center gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Period</label>
+                <input type="text" value="${exp.period || ''}" placeholder="Period (e.g. 2024 – Present)" onchange="cvState.experience[${expIdx}].period = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-accent-cyan">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Job Role / Title</label>
+                <input type="text" value="${exp.role || ''}" placeholder="Role Title" onchange="cvState.experience[${expIdx}].role = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Company / Client</label>
+                <input type="text" value="${exp.company || ''}" placeholder="Company Name" onchange="cvState.experience[${expIdx}].company = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold text-gray-300">
+              </div>
+            </div>
+            <button type="button" onclick="deleteCvExperience(${expIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete Entry</button>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase">Key Responsibilities / Achievements</label>
+            <div class="space-y-2">
+              ${(exp.bullets || []).map((bullet, bulletIdx) => `
+                <div class="flex items-start gap-2">
+                  <span class="text-accent-cyan pt-2 font-bold">•</span>
+                  <textarea onchange="cvState.experience[${expIdx}].bullets[${bulletIdx}] = this.value" class="flex-1 p-2.5 rounded-xl glass-input text-xs leading-relaxed h-16">${bullet}</textarea>
+                  <button type="button" onclick="removeCvExperienceBullet(${expIdx}, ${bulletIdx})" class="p-2 text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer">✕</button>
+                </div>
+              `).join('')}
+            </div>
+            <div class="flex gap-2 pt-1">
+              <input type="text" id="newExpBullet_${expIdx}" placeholder="Add new career achievement bullet..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addCvExperienceBullet(${expIdx});}" class="flex-1 px-3 py-2 rounded-xl glass-input text-xs">
+              <button type="button" onclick="addCvExperienceBullet(${expIdx})" class="px-4 py-2 rounded-xl bg-accent-cyan text-white text-xs font-bold cursor-pointer">+ Add Bullet</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addCvExperience() {
+      cvState.experience.push({ period: '2025 – Present', role: 'Full-Stack Developer', company: 'Company Name', bullets: ['Engineered applications...'] });
+      renderCvExperience();
+    }
+
+    function deleteCvExperience(expIdx) {
+      cvState.experience.splice(expIdx, 1);
+      renderCvExperience();
+    }
+
+    function addCvExperienceBullet(expIdx) {
+      const input = document.getElementById(`newExpBullet_${expIdx}`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (val) {
+        if (!cvState.experience[expIdx].bullets) cvState.experience[expIdx].bullets = [];
+        cvState.experience[expIdx].bullets.push(val);
+        input.value = '';
+        renderCvExperience();
+      }
+    }
+
+    function removeCvExperienceBullet(expIdx, bulletIdx) {
+      cvState.experience[expIdx].bullets.splice(bulletIdx, 1);
+      renderCvExperience();
+    }
+
+    // --- CV EDUCATION MANAGER ---
+    function renderCvEducation() {
+      const container = document.getElementById('cvEducationContainer');
+      if (!container) return;
+      if (cvState.education.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No education entries added yet. Click "+ Add Education Entry" above.</p>`;
+        return;
+      }
+      container.innerHTML = cvState.education.map((edu, eduIdx) => `
+        <div class="glass-card p-4 rounded-2xl border border-white/10 flex justify-between items-center gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Degree / Qualification</label>
+              <input type="text" value="${edu.degree || ''}" placeholder="Degree (e.g. B.Sc. Computer Science)" onchange="cvState.education[${eduIdx}].degree = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-400">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Institution / University</label>
+              <input type="text" value="${edu.institution || ''}" placeholder="University Name" onchange="cvState.education[${eduIdx}].institution = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold text-white">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Period / Year</label>
+              <input type="text" value="${edu.period || ''}" placeholder="Year / Status (e.g. 2020 - 2024)" onchange="cvState.education[${eduIdx}].period = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-gray-300">
+            </div>
+          </div>
+          <button type="button" onclick="deleteCvEducation(${eduIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function addCvEducation() {
+      cvState.education.push({ degree: 'Bachelor of Science (B.Sc.)', institution: 'University Degree Program', period: '2024' });
+      renderCvEducation();
+    }
+
+    function deleteCvEducation(eduIdx) {
+      cvState.education.splice(eduIdx, 1);
+      renderCvEducation();
+    }
+
+    function updateStatCounters() {
+      document.getElementById('stat-projects').innerText = state.projects.length;
+      document.getElementById('stat-skills').innerText = state.skills.length;
+      document.getElementById('stat-experiences').innerText = state.experiences.length;
+      document.getElementById('stat-strengths').innerText = state.strengths.length;
+      document.getElementById('stat-contacts').innerText = state.contacts.length;
+      document.getElementById('inboxCount').innerText = state.contacts.length;
+
+      document.getElementById('tab-count-projects').innerText = state.projects.length;
+      document.getElementById('tab-count-skills').innerText = state.skills.length;
+      document.getElementById('tab-count-experiences').innerText = state.experiences.length;
+      document.getElementById('tab-count-strengths').innerText = state.strengths.length;
+
+      document.getElementById('mob-count-projects').innerText = state.projects.length;
+      document.getElementById('mob-count-skills').innerText = state.skills.length;
+      document.getElementById('mob-count-experiences').innerText = state.experiences.length;
+      document.getElementById('mob-count-strengths').innerText = state.strengths.length;
+      document.getElementById('mob-count-contacts').innerText = state.contacts.length;
+    }
+
+    // --- RENDER FUNCTIONS ---
+    function renderProjects() {
+      const container = document.getElementById('projectsGrid');
+      if (state.projects.length === 0) {
+        container.innerHTML = `<p class="col-span-3 text-gray-500 text-xs text-center py-8">No projects added yet.</p>`;
+        return;
+      }
+      container.innerHTML = state.projects.map(p => {
+        const hasValidImage = p.image && p.image.trim().startsWith('http');
+        const imgMarkup = hasValidImage
+          ? `<img src="${p.image}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-full h-36 object-cover rounded-xl border border-white/5">
+             <div style="display:none;" class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-slate-800 to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
+               <span class="font-display font-bold text-white text-sm">${p.title || 'Project'}</span>
+             </div>`
+          : `<div class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-slate-800 to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
+               <span class="font-display font-bold text-white text-sm">${p.title || 'Project'}</span>
+             </div>`;
+
+        const techArray = Array.isArray(p.tech) ? p.tech : (typeof p.tech === 'string' ? p.tech.split(',') : []);
+
+        return `
+          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              ${imgMarkup}
+              <h3 class="font-bold text-white font-display text-base leading-tight">${p.title}</h3>
+              <p class="text-xs text-gray-400 line-clamp-2">${p.desc || p.description || ''}</p>
+              <div class="flex flex-wrap gap-1">
+                ${techArray.map(t => `<span class="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-accent-teal border border-accent-teal/20 font-semibold">${t.trim()}</span>`).join('')}
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-white/5">
+              <button onclick="editProject('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/15 hover:bg-accent-teal text-accent-teal hover:text-white text-xs font-semibold transition-all cursor-pointer">Edit</button>
+              <button onclick="deleteProject('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSkills() {
+      const container = document.getElementById('skillsContainer');
+      const cats = ['Frontend', 'Backend', 'Tools'];
+      container.innerHTML = cats.map(cat => {
+        const catSkills = state.skills.filter(s => (s.category || '').toLowerCase().includes(cat.toLowerCase()));
+        return `
+          <div class="glass-card p-5 rounded-2xl space-y-4">
+            <h3 class="font-bold text-accent-teal uppercase tracking-wider text-xs font-display border-b border-white/5 pb-2">${cat}</h3>
+            <div class="space-y-3">
+              ${catSkills.length === 0 ? `<p class="text-[11px] text-gray-500">No ${cat} skills added</p>` : catSkills.map(s => `
+                <div class="flex items-center justify-between text-xs">
+                  <div>
+                    <p class="font-semibold text-white">${s.name}</p>
+                    <div class="w-28 bg-white/10 rounded-full h-1.5 mt-1">
+                      <div class="bg-accent-teal h-1.5 rounded-full" style="width: ${s.level}%"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-400 text-[10px] font-mono">${s.level}%</span>
+                    <button onclick="deleteSkill('${s.id}')" class="text-rose-400 hover:text-rose-300 font-bold px-1 cursor-pointer">Delete</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderExperiences() {
+      const container = document.getElementById('experiencesList');
+      if (state.experiences.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-8">No experience entries added yet.</p>`;
+        return;
+      }
+      container.innerHTML = state.experiences.map(e => `
+        <div class="glass-card p-5 rounded-2xl flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="text-[10px] font-bold text-accent-teal uppercase tracking-widest">${e.period}</span>
+            <h3 class="font-bold text-white text-base font-display">${e.role}</h3>
+            <p class="text-xs text-gray-400 max-w-2xl">${e.description}</p>
+          </div>
+          <button onclick="deleteExperience('${e.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function renderStrengths() {
+      const container = document.getElementById('strengthsGrid');
+      if (state.strengths.length === 0) {
+        container.innerHTML = `<p class="col-span-2 text-gray-500 text-xs text-center py-8">No strengths added yet.</p>`;
+        return;
+      }
+      container.innerHTML = state.strengths.map(s => `
+        <div class="glass-card p-5 rounded-2xl flex justify-between items-start space-y-2">
+          <div class="space-y-1">
+            <h3 class="font-bold text-white text-base font-display">${s.title}</h3>
+            <p class="text-xs text-gray-400">${s.desc || s.description || ''}</p>
+          </div>
+          <button onclick="deleteStrength('${s.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function renderContacts() {
+      const container = document.getElementById('contactsList');
+      if (state.contacts.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs text-center py-8">No message entries in inbox.</p>`;
+        return;
+      }
+      container.innerHTML = state.contacts.map(c => `
+        <div class="glass-card p-5 rounded-2xl space-y-2">
+          <div class="flex justify-between items-start flex-wrap gap-2">
+            <div>
+              <h3 class="font-bold text-white text-sm">${c.full_name || c.fullName}</h3>
+              <a href="mailto:${c.email}" class="text-xs text-accent-teal hover:underline">${c.email}</a>
+            </div>
+            <span class="text-[10px] text-gray-500">${c.created_at ? new Date(c.created_at).toLocaleString() : ''}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5 text-xs text-gray-300 whitespace-pre-wrap">${c.description}</div>
+          <div class="flex justify-end gap-2 pt-1">
+            <a href="mailto:${c.email}" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/20 text-accent-teal hover:bg-accent-teal hover:text-white text-xs font-semibold transition-all">Reply Email</a>
+            <button onclick="deleteContact('${c.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- ACTIONS ---
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer';
+      });
+      const currentTab = document.getElementById(`tab-${tab}`);
+      if (currentTab) currentTab.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-accent-teal text-white shadow-md flex items-center gap-2 cursor-pointer';
+
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`section-${tab}`).classList.remove('hidden');
+    }
+
+    function openModal(id) {
+      if (id === 'projectModal') {
+        document.getElementById('projId').value = '';
+        document.getElementById('projTitle').value = '';
+        document.getElementById('projDesc').value = '';
+        document.getElementById('projImage').value = '';
+        document.getElementById('projTech').value = '';
+        document.getElementById('projDemo').value = '';
+        document.getElementById('projCode').value = '';
+        if (document.getElementById('projFileInput')) document.getElementById('projFileInput').value = '';
+        updateImagePreview('');
+      }
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function updateImagePreview(url) {
+      const img = document.getElementById('projImagePreview');
+      const placeholder = document.getElementById('projImagePlaceholder');
+      if (!img || !placeholder) return;
+      if (url && url.trim()) {
+        img.src = url;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.src = '';
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    async function uploadImageToCloudinary(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const progressEl = document.getElementById('uploadProgress');
+      progressEl.innerText = 'Uploading to Cloudinary...';
+      progressEl.classList.remove('hidden');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers,
+          body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok && data.url) {
+          document.getElementById('projImage').value = data.url;
+          updateImagePreview(data.url);
+          progressEl.innerText = 'Uploaded successfully!';
+          showToast('Image uploaded to Cloudinary!', 'success');
+          setTimeout(() => progressEl.classList.add('hidden'), 3000);
+        } else {
+          const errMsg = data.error || 'Failed to upload image to Cloudinary.';
+          showToast(errMsg, 'error');
+          progressEl.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('[Cloudinary Upload Error]', err);
+        showToast('Image upload error. Check server connection.', 'error');
+        progressEl.classList.add('hidden');
+      }
+    }
+
+    async function saveProject(e) {
+      e.preventDefault();
+      const id = document.getElementById('projId').value;
+      const payload = {
+        title: document.getElementById('projTitle').value,
+        desc: document.getElementById('projDesc').value,
+        image: document.getElementById('projImage').value,
+        tech: document.getElementById('projTech').value.split(',').map(t => t.trim()),
+        demoLink: document.getElementById('projDemo').value,
+        codeLink: document.getElementById('projCode').value
+      };
+      try {
+        if (id) {
+          await fetchApi(`/api/projects/${id}`, 'PUT', payload);
+          showToast('Project updated successfully!', 'success');
+        } else {
+          await fetchApi('/api/projects', 'POST', payload);
+          showToast('New project created successfully!', 'success');
+        }
+        closeModal('projectModal');
+        loadAllData();
+      } catch (err) {
+        showToast('Error saving project', 'error');
+      }
+    }
+
+    function editProject(id) {
+      const p = state.projects.find(x => String(x.id) === String(id));
+      if (!p) return;
+      document.getElementById('projId').value = p.id;
+      document.getElementById('projTitle').value = p.title || '';
+      document.getElementById('projDesc').value = p.desc || p.description || '';
+      document.getElementById('projImage').value = p.image || '';
+      document.getElementById('projTech').value = Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || '');
+      document.getElementById('projDemo').value = p.demoLink || p.demo_link || '';
+      document.getElementById('projCode').value = p.codeLink || p.code_link || '';
+      updateImagePreview(p.image || '');
+      document.getElementById('projectModal').classList.remove('hidden');
+    }
+
+    async function deleteProject(id) {
+      try {
+        await fetchApi(`/api/projects/${id}`, 'DELETE');
+        showToast('Project deleted successfully!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting project', 'error');
+      }
+    }
+
+    async function saveSkill(e) {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('skillName').value,
+        level: parseInt(document.getElementById('skillLevel').value),
+        category: document.getElementById('skillCategory').value
+      };
+      try {
+        await fetchApi('/api/skills', 'POST', payload);
+        showToast('Skill saved successfully!', 'success');
+        closeModal('skillModal');
+        loadAllData();
+      } catch (err) {
+        showToast('Error saving skill', 'error');
+      }
+    }
+
+    async function deleteSkill(id) {
+      try {
+        await fetchApi(`/api/skills/${id}`, 'DELETE');
+        showToast('Skill removed!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting skill', 'error');
+      }
+    }
+
+    async function saveExperience(e) {
+      e.preventDefault();
+      const payload = {
+        period: document.getElementById('expPeriod').value,
+        role: document.getElementById('expRole').value,
+        description: document.getElementById('expDesc').value
+      };
+      try {
+        await fetchApi('/api/experiences', 'POST', payload);
+        showToast('Experience entry saved!', 'success');
+        closeModal('experienceModal');
+        loadAllData();
+      } catch (err) {
+        showToast('Error saving experience', 'error');
+      }
+    }
+
+    async function deleteExperience(id) {
+      try {
+        await fetchApi(`/api/experiences/${id}`, 'DELETE');
+        showToast('Experience entry deleted!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting experience', 'error');
+      }
+    }
+
+    async function saveStrength(e) {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById('strTitle').value,
+        desc: document.getElementById('strDesc').value
+      };
+      try {
+        await fetchApi('/api/strengths', 'POST', payload);
+        showToast('Strength item saved!', 'success');
+        closeModal('strengthModal');
+        loadAllData();
+      } catch (err) {
+        showToast('Error saving strength', 'error');
+      }
+    }
+
+    async function deleteStrength(id) {
+      try {
+        await fetchApi(`/api/strengths/${id}`, 'DELETE');
+        showToast('Strength item deleted!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting strength', 'error');
+      }
+    }
+
+    async function deleteContact(id) {
+      try {
+        await fetchApi(`/api/contacts/${id}`, 'DELETE');
+        showToast('Contact message entry deleted!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting contact entry', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
