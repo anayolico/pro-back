@@ -117,31 +117,31 @@
     </div>
   </header>
 
-  <!-- MOBILE NAVIGATION DRAWER (NO EMOJIS) -->
-  <div id="mobileDrawer" class="hidden md:hidden fixed inset-x-0 top-[65px] z-30 glass-card border-b border-white/10 p-4 space-y-3 shadow-2xl">
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div id="mobileDrawer" class="hidden md:hidden fixed inset-x-0 top-[70px] z-50 bg-[#0f1624]/95 backdrop-blur-2xl border-b border-white/10 p-4 space-y-3 shadow-2xl max-h-[calc(100vh-75px)] overflow-y-auto">
     <div class="grid grid-cols-2 gap-2">
-      <button onclick="switchTab('projects'); toggleMobileNav();" id="mob-tab-projects" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-accent-teal text-white flex items-center justify-between">
+      <button onclick="switchTab('projects'); toggleMobileNav();" id="mob-tab-projects" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-accent-teal text-white flex items-center justify-between shadow-sm">
         <span>Projects</span>
         <span id="mob-count-projects" class="px-2 py-0.5 rounded-full bg-black/20 text-[10px]">0</span>
       </button>
-      <button onclick="switchTab('skills'); toggleMobileNav();" id="mob-tab-skills" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+      <button onclick="switchTab('skills'); toggleMobileNav();" id="mob-tab-skills" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between">
         <span>Skills</span>
         <span id="mob-count-skills" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
-      <button onclick="switchTab('experiences'); toggleMobileNav();" id="mob-tab-experiences" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+      <button onclick="switchTab('experiences'); toggleMobileNav();" id="mob-tab-experiences" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between">
         <span>Experience</span>
         <span id="mob-count-experiences" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
-      <button onclick="switchTab('strengths'); toggleMobileNav();" id="mob-tab-strengths" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+      <button onclick="switchTab('strengths'); toggleMobileNav();" id="mob-tab-strengths" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between">
         <span>Strengths</span>
         <span id="mob-count-strengths" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
     </div>
-    <button onclick="switchTab('contacts'); toggleMobileNav();" id="mob-tab-contacts" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+    <button onclick="switchTab('contacts'); toggleMobileNav();" id="mob-tab-contacts" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between">
       <span>Contact Messages</span>
       <span id="mob-count-contacts" class="px-2.5 py-0.5 rounded-full bg-accent-purple/20 text-accent-purple border border-accent-purple/30 text-[10px]">0</span>
     </button>
-    <button onclick="switchTab('cv'); toggleMobileNav();" id="mob-tab-cv" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 flex items-center justify-between">
+    <button onclick="switchTab('cv'); toggleMobileNav();" id="mob-tab-cv" class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between">
       <span>CV / Resume</span>
     </button>
     <div class="pt-2 border-t border-white/10 flex justify-between items-center">
