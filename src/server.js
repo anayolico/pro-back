@@ -65,10 +65,12 @@ app.use((req, res, next) => {
 // Serve static admin dashboard
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 
-// Health check — must be before the wildcard /api content router
-app.get('/api/health', (req, res) => {
+// Health check — available at both /health and /api/health
+const healthHandler = (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
-});
+};
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // API Routes
 app.use('/api/auth', authRouter);
