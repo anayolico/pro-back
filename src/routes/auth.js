@@ -5,22 +5,36 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-admin-key-portfolio';
 
-// Default Admin credentials (can be overridden via env)
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+// Helper to clean env vars (removes surrounding quotes and whitespace)
+const cleanEnv = (val, fallback) => {
+  if (!val) return fallback;
+  return val.trim().replace(/^["']|["']$/g, '');
+};
 
 /**
  * POST /api/auth/login
  */
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body || {};
+  let { username, password } = req.body || {};
 
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
   }
 
-  const isValidUser = username === ADMIN_USERNAME;
-  const isValidPass = password === ADMIN_PASSWORD || bcrypt.compareSync(password, bcrypt.hashSync(ADMIN_PASSWORD, 8));
+  // Get configured credentials strictly from process.env (never hardcoded in source code)
+  const configuredUser = cleanEnv(process.env.ADMIN_USERNAME);
+  const configuredPass = cleanEnv(process.env.ADMIN_PASSWORD);
+
+  if (!configuredUser || !configuredPass) {
+    console.error('[Auth Error] ADMIN_USERNAME or ADMIN_PASSWORD environment variable is not configured.');
+    return res.status(500).json({ error: 'Server authentication misconfigured.' });
+  }
+
+  username = username.trim();
+  password = password.trim();
+
+  const isValidUser = username.toLowerCase() === configuredUser.toLowerCase();
+  const isValidPass = password === configuredPass || bcrypt.compareSync(password, bcrypt.hashSync(configuredPass, 8));
 
   if (!isValidUser || !isValidPass) {
     return res.status(401).json({ error: 'Invalid username or password.' });
