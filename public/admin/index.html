@@ -894,6 +894,8 @@
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
+      const btn = e.target.closest('label');
+      if (btn) setButtonLoading(btn, true, 'Uploading...');
       const progressEl = document.getElementById('hackathonUploadProgress');
       progressEl.innerText = 'Uploading Award Photo to Cloudinary...';
       progressEl.classList.remove('hidden');
@@ -929,6 +931,8 @@
         console.error('[Award Upload Error]', err);
         showToast('Upload error. Check server connection.', 'error');
         progressEl.classList.add('hidden');
+      } finally {
+        if (btn) setButtonLoading(btn, false);
       }
     }
 
@@ -953,9 +957,11 @@
 
     async function saveCv(e) {
       if (e) e.preventDefault();
+      const submitBtn = e?.target?.querySelector?.('button[type="submit"]') || document.querySelector('button[onclick="saveCv(event)"]');
       const statusEl = document.getElementById('cvSaveStatus');
       statusEl.classList.add('hidden');
 
+      if (submitBtn) setButtonLoading(submitBtn, true, 'Publishing CV...');
       try {
         if (!cvState.hackathonProject) cvState.hackathonProject = {};
         cvState.hackathonProject.title = document.getElementById('hackathonTitle').value;
@@ -992,6 +998,8 @@
         }
       } catch (err) {
         showToast('Error saving CV data', 'error');
+      } finally {
+        if (submitBtn) setButtonLoading(submitBtn, false);
       }
     }
 
@@ -1289,7 +1297,7 @@
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-white/5">
               <button onclick="editProject('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/15 hover:bg-accent-teal text-accent-teal hover:text-white text-xs font-semibold transition-all cursor-pointer">Edit</button>
-              <button onclick="deleteProject('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+              <button onclick="deleteProject('${p.id}', this)" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
             </div>
           </div>
         `;
@@ -1313,9 +1321,10 @@
                       <div class="bg-accent-teal h-1.5 rounded-full" style="width: ${s.level}%"></div>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5">
                     <span class="text-gray-400 text-[10px] font-mono">${s.level}%</span>
-                    <button onclick="deleteSkill('${s.id}')" class="text-rose-400 hover:text-rose-300 font-bold px-1 cursor-pointer">Delete</button>
+                    <button onclick="editSkill('${s.id}')" class="text-accent-teal hover:text-white font-bold text-[11px] px-1 cursor-pointer">Edit</button>
+                    <button onclick="deleteSkill('${s.id}', this)" class="text-rose-400 hover:text-rose-300 font-bold text-[11px] px-1 cursor-pointer">Delete</button>
                   </div>
                 </div>
               `).join('')}
@@ -1332,13 +1341,16 @@
         return;
       }
       container.innerHTML = state.experiences.map(e => `
-        <div class="glass-card p-5 rounded-2xl flex justify-between items-start">
+        <div class="glass-card p-5 rounded-2xl flex justify-between items-start gap-4">
           <div class="space-y-1">
             <span class="text-[10px] font-bold text-accent-teal uppercase tracking-widest">${e.period}</span>
             <h3 class="font-bold text-white text-base font-display">${e.role}</h3>
             <p class="text-xs text-gray-400 max-w-2xl">${e.description}</p>
           </div>
-          <button onclick="deleteExperience('${e.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="editExperience('${e.id}')" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/15 hover:bg-accent-teal text-accent-teal hover:text-white text-xs font-semibold transition-all cursor-pointer">Edit</button>
+            <button onclick="deleteExperience('${e.id}', this)" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1350,12 +1362,15 @@
         return;
       }
       container.innerHTML = state.strengths.map(s => `
-        <div class="glass-card p-5 rounded-2xl flex justify-between items-start space-y-2">
+        <div class="glass-card p-5 rounded-2xl flex justify-between items-start gap-4 space-y-2">
           <div class="space-y-1">
             <h3 class="font-bold text-white text-base font-display">${s.title}</h3>
             <p class="text-xs text-gray-400">${s.desc || s.description || ''}</p>
           </div>
-          <button onclick="deleteStrength('${s.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="editStrength('${s.id}')" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/15 hover:bg-accent-teal text-accent-teal hover:text-white text-xs font-semibold transition-all cursor-pointer">Edit</button>
+            <button onclick="deleteStrength('${s.id}', this)" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1378,7 +1393,7 @@
           <div class="p-3 rounded-xl bg-white/5 text-xs text-gray-300 whitespace-pre-wrap">${c.description}</div>
           <div class="flex justify-end gap-2 pt-1">
             <a href="mailto:${c.email}" class="px-3.5 py-1.5 rounded-xl bg-accent-teal/20 text-accent-teal hover:bg-accent-teal hover:text-white text-xs font-semibold transition-all">Reply Email</a>
-            <button onclick="deleteContact('${c.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
+            <button onclick="deleteContact('${c.id}', this)" class="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-semibold transition-all cursor-pointer">Delete</button>
           </div>
         </div>
       `).join('');
@@ -1405,8 +1420,26 @@
         document.getElementById('projTech').value = '';
         document.getElementById('projDemo').value = '';
         document.getElementById('projCode').value = '';
+        if (document.getElementById('projectModalTitle')) document.getElementById('projectModalTitle').innerText = 'Add Project';
         if (document.getElementById('projFileInput')) document.getElementById('projFileInput').value = '';
         updateImagePreview('');
+      } else if (id === 'skillModal') {
+        document.getElementById('skillId').value = '';
+        document.getElementById('skillName').value = '';
+        document.getElementById('skillLevel').value = '';
+        document.getElementById('skillCategory').value = 'Frontend';
+        if (document.getElementById('skillModalTitle')) document.getElementById('skillModalTitle').innerText = 'Add Skill';
+      } else if (id === 'experienceModal') {
+        document.getElementById('expId').value = '';
+        document.getElementById('expPeriod').value = '';
+        document.getElementById('expRole').value = '';
+        document.getElementById('expDesc').value = '';
+        if (document.getElementById('expModalTitle')) document.getElementById('expModalTitle').innerText = 'Add Experience';
+      } else if (id === 'strengthModal') {
+        document.getElementById('strId').value = '';
+        document.getElementById('strTitle').value = '';
+        document.getElementById('strDesc').value = '';
+        if (document.getElementById('strModalTitle')) document.getElementById('strModalTitle').innerText = 'Add Strength';
       }
       document.getElementById(id).classList.remove('hidden');
     }
@@ -1432,6 +1465,8 @@
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
+      const btn = e.target.closest('label');
+      if (btn) setButtonLoading(btn, true, 'Uploading...');
       const progressEl = document.getElementById('uploadProgress');
       progressEl.innerText = 'Uploading to Cloudinary...';
       progressEl.classList.remove('hidden');
@@ -1465,11 +1500,14 @@
         console.error('[Cloudinary Upload Error]', err);
         showToast('Image upload error. Check server connection.', 'error');
         progressEl.classList.add('hidden');
+      } finally {
+        if (btn) setButtonLoading(btn, false);
       }
     }
 
     async function saveProject(e) {
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
       const id = document.getElementById('projId').value;
       const payload = {
         title: document.getElementById('projTitle').value,
@@ -1479,6 +1517,7 @@
         demoLink: document.getElementById('projDemo').value,
         codeLink: document.getElementById('projCode').value
       };
+      setButtonLoading(submitBtn, true, 'Saving...');
       try {
         if (id) {
           await fetchApi(`/api/projects/${id}`, 'PUT', payload);
@@ -1491,6 +1530,8 @@
         loadAllData();
       } catch (err) {
         showToast('Error saving project', 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     }
 
@@ -1504,107 +1545,180 @@
       document.getElementById('projTech').value = Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || '');
       document.getElementById('projDemo').value = p.demoLink || p.demo_link || '';
       document.getElementById('projCode').value = p.codeLink || p.code_link || '';
+      if (document.getElementById('projectModalTitle')) document.getElementById('projectModalTitle').innerText = 'Edit Project';
       updateImagePreview(p.image || '');
       document.getElementById('projectModal').classList.remove('hidden');
     }
 
-    async function deleteProject(id) {
+    async function deleteProject(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
       try {
         await fetchApi(`/api/projects/${id}`, 'DELETE');
         showToast('Project deleted successfully!', 'success');
         loadAllData();
       } catch (err) {
         showToast('Error deleting project', 'error');
+        if (btn) setButtonLoading(btn, false);
       }
+    }
+
+    function editSkill(id) {
+      const s = state.skills.find(x => String(x.id) === String(id));
+      if (!s) return;
+      document.getElementById('skillId').value = s.id;
+      document.getElementById('skillName').value = s.name || '';
+      document.getElementById('skillLevel').value = s.level || 50;
+      document.getElementById('skillCategory').value = s.category || 'Frontend';
+      if (document.getElementById('skillModalTitle')) document.getElementById('skillModalTitle').innerText = 'Edit Skill';
+      document.getElementById('skillModal').classList.remove('hidden');
     }
 
     async function saveSkill(e) {
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const id = document.getElementById('skillId').value;
       const payload = {
         name: document.getElementById('skillName').value,
         level: parseInt(document.getElementById('skillLevel').value),
         category: document.getElementById('skillCategory').value
       };
+      setButtonLoading(submitBtn, true, 'Saving...');
       try {
-        await fetchApi('/api/skills', 'POST', payload);
-        showToast('Skill saved successfully!', 'success');
+        if (id) {
+          await fetchApi(`/api/skills/${id}`, 'PUT', payload);
+          showToast('Skill updated successfully!', 'success');
+        } else {
+          await fetchApi('/api/skills', 'POST', payload);
+          showToast('Skill saved successfully!', 'success');
+        }
         closeModal('skillModal');
         loadAllData();
       } catch (err) {
         showToast('Error saving skill', 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     }
 
-    async function deleteSkill(id) {
+    async function deleteSkill(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
       try {
         await fetchApi(`/api/skills/${id}`, 'DELETE');
         showToast('Skill removed!', 'success');
         loadAllData();
       } catch (err) {
         showToast('Error deleting skill', 'error');
+        if (btn) setButtonLoading(btn, false);
       }
+    }
+
+    function editExperience(id) {
+      const e = state.experiences.find(x => String(x.id) === String(id));
+      if (!e) return;
+      document.getElementById('expId').value = e.id;
+      document.getElementById('expPeriod').value = e.period || '';
+      document.getElementById('expRole').value = e.role || '';
+      document.getElementById('expDesc').value = e.description || '';
+      if (document.getElementById('expModalTitle')) document.getElementById('expModalTitle').innerText = 'Edit Experience';
+      document.getElementById('experienceModal').classList.remove('hidden');
     }
 
     async function saveExperience(e) {
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const id = document.getElementById('expId').value;
       const payload = {
         period: document.getElementById('expPeriod').value,
         role: document.getElementById('expRole').value,
         description: document.getElementById('expDesc').value
       };
+      setButtonLoading(submitBtn, true, 'Saving...');
       try {
-        await fetchApi('/api/experiences', 'POST', payload);
-        showToast('Experience entry saved!', 'success');
+        if (id) {
+          await fetchApi(`/api/experiences/${id}`, 'PUT', payload);
+          showToast('Experience entry updated!', 'success');
+        } else {
+          await fetchApi('/api/experiences', 'POST', payload);
+          showToast('Experience entry saved!', 'success');
+        }
         closeModal('experienceModal');
         loadAllData();
       } catch (err) {
         showToast('Error saving experience', 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     }
 
-    async function deleteExperience(id) {
+    async function deleteExperience(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
       try {
         await fetchApi(`/api/experiences/${id}`, 'DELETE');
         showToast('Experience entry deleted!', 'success');
         loadAllData();
       } catch (err) {
         showToast('Error deleting experience', 'error');
+        if (btn) setButtonLoading(btn, false);
       }
+    }
+
+    function editStrength(id) {
+      const st = state.strengths.find(x => String(x.id) === String(id));
+      if (!st) return;
+      document.getElementById('strId').value = st.id;
+      document.getElementById('strTitle').value = st.title || '';
+      document.getElementById('strDesc').value = st.desc || st.description || '';
+      if (document.getElementById('strModalTitle')) document.getElementById('strModalTitle').innerText = 'Edit Strength';
+      document.getElementById('strengthModal').classList.remove('hidden');
     }
 
     async function saveStrength(e) {
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const id = document.getElementById('strId').value;
       const payload = {
         title: document.getElementById('strTitle').value,
         desc: document.getElementById('strDesc').value
       };
+      setButtonLoading(submitBtn, true, 'Saving...');
       try {
-        await fetchApi('/api/strengths', 'POST', payload);
-        showToast('Strength item saved!', 'success');
+        if (id) {
+          await fetchApi(`/api/strengths/${id}`, 'PUT', payload);
+          showToast('Strength item updated!', 'success');
+        } else {
+          await fetchApi('/api/strengths', 'POST', payload);
+          showToast('Strength item saved!', 'success');
+        }
         closeModal('strengthModal');
         loadAllData();
       } catch (err) {
         showToast('Error saving strength', 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     }
 
-    async function deleteStrength(id) {
+    async function deleteStrength(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
       try {
         await fetchApi(`/api/strengths/${id}`, 'DELETE');
         showToast('Strength item deleted!', 'success');
         loadAllData();
       } catch (err) {
         showToast('Error deleting strength', 'error');
+        if (btn) setButtonLoading(btn, false);
       }
     }
 
-    async function deleteContact(id) {
+    async function deleteContact(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
       try {
         await fetchApi(`/api/contacts/${id}`, 'DELETE');
         showToast('Contact message entry deleted!', 'success');
         loadAllData();
       } catch (err) {
         showToast('Error deleting contact entry', 'error');
+        if (btn) setButtonLoading(btn, false);
       }
     }
   </script>
