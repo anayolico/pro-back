@@ -144,12 +144,48 @@ const defaultCvData = {
   ]
 };
 
+const defaultSourceCodes = [
+  {
+    id: "1",
+    title: "MR Bayo AI Agent Source Code",
+    filename: "mr-bayo.zip",
+    filesize: "10.1 MB",
+    description: "Includes the complete Mr. Bayo AI Agent source code, project structure, setup requirements, and everything you need to run and understand the system.",
+    tech: ["Python", "FastAPI", "AI Agents", "React"],
+    price: 15000,
+    download_link: "#"
+  },
+  {
+    id: "2",
+    title: "Browser Cookie & Key Decryption Engine",
+    filename: "Browser Decryption.zip",
+    filesize: "60 KB",
+    description: "This contains the complete source code for decrypting V20 browser cookies and session keys, including cookies stored in Google Chrome & Chromium browsers.",
+    tech: ["Python", "Cryptography", "Chrome API"],
+    price: 15000,
+    download_link: "#"
+  }
+];
+
+const defaultProjects = [
+  {
+    id: "1",
+    title: "Nigeria SecureVote",
+    desc: "Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.",
+    image: "/media__1786134354519.png",
+    tech: ["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"],
+    demo_link: "https://nigeria-secure-vote.vercel.app",
+    code_link: "https://github.com/anayolico/onetime"
+  }
+];
+
 let memoryDb = {
-  projects: [],
+  projects: defaultProjects,
   skills: [],
   experiences: [],
   strengths: [],
   contacts: [],
+  source_codes: defaultSourceCodes,
   cv: defaultCvData
 };
 
@@ -220,6 +256,18 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS source_codes (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        filename TEXT,
+        filesize TEXT,
+        description TEXT NOT NULL,
+        tech JSONB,
+        price INT NOT NULL DEFAULT 15000,
+        download_link TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE TABLE IF NOT EXISTS cv (
         id INT PRIMARY KEY DEFAULT 1,
         content JSONB NOT NULL
@@ -230,6 +278,13 @@ async function initDb() {
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS desc_text TEXT;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS desc_text TEXT;
+    `);
+
+    // Ensure Nigeria SecureVote exists in projects table
+    await client.query(`
+      INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link)
+      SELECT 'Nigeria SecureVote', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', '/media__1786134354519.png', '["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"]'::jsonb, 'https://nigeria-secure-vote.vercel.app', 'https://github.com/anayolico/onetime'
+      WHERE NOT EXISTS (SELECT 1 FROM projects WHERE LOWER(title) LIKE '%securevote%');
     `);
 
     await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO NOTHING`, [JSON.stringify(defaultCvData)]);
@@ -273,6 +328,9 @@ async function getTableData(table) {
       }
       if (row.code_link) {
         row.codeLink = row.code_link;
+      }
+      if (row.download_link) {
+        row.downloadLink = row.download_link;
       }
       rows.push(row);
     });
@@ -325,6 +383,12 @@ async function insertItem(table, data) {
         [data.fullName || data.full_name || '', data.email || '', data.description || '']
       );
       return res.rows[0];
+    } else if (table === 'source_codes') {
+      const res = await pool.query(
+        `INSERT INTO source_codes (title, filename, filesize, description, tech, price, download_link) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.price || 15000, data.downloadLink || data.download_link || '#']
+      );
+      return res.rows[0];
     }
   } catch (err) {
     console.error(`[DB Error] insertItem(${table}):`, err.message);
@@ -371,6 +435,12 @@ async function updateItem(table, id, data) {
       const res = await pool.query(
         `UPDATE strengths SET title=$1, "desc"=$2, desc_text=$2, dot=$3 WHERE id=$4 RETURNING *`,
         [data.title, descVal, data.dot || 'bg-accent-teal', id]
+      );
+      return res.rows[0];
+    } else if (table === 'source_codes') {
+      const res = await pool.query(
+        `UPDATE source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, price=$6, download_link=$7 WHERE id=$8 RETURNING *`,
+        [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.price, data.downloadLink || data.download_link || '#', id]
       );
       return res.rows[0];
     }

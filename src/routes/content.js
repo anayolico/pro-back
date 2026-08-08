@@ -152,6 +152,36 @@ router.delete('/strengths/:id', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/source-codes', handleGet('source_codes'));
+
+// Source Codes CRUD
+router.post('/source-codes', authenticateToken, async (req, res) => {
+  try {
+    const item = await insertItem('source_codes', req.body);
+    return res.status(201).json({ success: true, data: item });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error creating source code item' });
+  }
+});
+
+router.put('/source-codes/:id', authenticateToken, async (req, res) => {
+  try {
+    const updated = await updateItem('source_codes', req.params.id, req.body);
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error updating source code item' });
+  }
+});
+
+router.delete('/source-codes/:id', authenticateToken, async (req, res) => {
+  try {
+    await deleteItem('source_codes', req.params.id);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error deleting source code item' });
+  }
+});
+
 // Contacts Admin Inbox
 router.get('/contacts', authenticateToken, async (req, res) => {
   try {

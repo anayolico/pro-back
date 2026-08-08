@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id        Int      @id @default(autoincrement())
+  title     String
+  desc      String?
+  image     String?
+  tech      Json?
+  demoLink  String?
+  codeLink  String?
+  createdAt DateTime @default(now())
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  name      String
+  level     Int      @default(80)
+  category  String
+  createdAt DateTime @default(now())
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  period      String
+  role        String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Strength {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  fullName    String
+  email       String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Cv {
+  id      Int  @id @default(1)
+  content Json
+}
+
+model SourceCode {
+  id           Int      @id @default(autoincrement())
+  title        String
+  filename     String?
+  filesize     String?
+  description  String
+  tech         Json?
+  price        Int      @default(15000)
+  downloadLink String?
+  createdAt    DateTime @default(now())
+}
