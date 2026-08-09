@@ -716,6 +716,32 @@
     let authToken = localStorage.getItem('adminToken');
     let state = { projects: [], skills: [], experiences: [], strengths: [], contacts: [] };
 
+    // Sets loading state for buttons and handles label wrappers safely for file inputs
+    function setButtonLoading(btn, isLoading, loadingText = 'Loading...') {
+      if (!btn) return;
+      if (isLoading) {
+        btn.dataset.originalText = btn.innerHTML;
+        // Keep the input if it's a label wrapper (for file inputs)
+        const input = btn.querySelector('input');
+        if (input) {
+          btn.innerHTML = `<span>${loadingText}</span>`;
+          btn.appendChild(input);
+        } else {
+          btn.innerText = loadingText;
+        }
+        btn.disabled = true;
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.7';
+      } else {
+        if (btn.dataset.originalText) {
+          btn.innerHTML = btn.dataset.originalText;
+        }
+        btn.disabled = false;
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+      }
+    }
+
     window.onload = () => {
       if (authToken) {
         verifyToken();
