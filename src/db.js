@@ -208,7 +208,7 @@ async function initDb() {
 
     const client = await pool.connect();
     console.log('[DB] Connected to PostgreSQL Database.');
-    
+
     // Create clean tables if not exist
     await client.query(`
       CREATE TABLE IF NOT EXISTS projects (
