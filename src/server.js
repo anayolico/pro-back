@@ -17,6 +17,7 @@ const { router: authRouter } = require('./routes/auth');
 const contactRouter = require('./routes/contact');
 const contentRouter = require('./routes/content');
 const uploadRouter = require('./routes/upload');
+const { sseHandler } = require('./sse');
 
 const app = express();
 const PORT = process.env.PORT || 1337;
@@ -71,6 +72,9 @@ const healthHandler = (req, res) => {
 };
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
+
+// Server-Sent Events Endpoint for real-time portfolio updates
+app.get('/api/stream', sseHandler);
 
 // Root route (for Render load balancer pings and direct URL visits)
 app.get('/', (req, res) => {

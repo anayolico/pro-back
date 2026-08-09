@@ -1,6 +1,7 @@
 const express = require('express');
 const { getTableData, insertItem, updateItem, deleteItem, getCvData, updateCvData } = require('../db');
 const { authenticateToken } = require('./auth');
+const { broadcastUpdate } = require('../sse');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.get('/strengths', handleGet('strengths'));
 router.get('/cv', async (req, res) => {
   try {
     const data = await getCvData();
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data });
   } catch (err) {
     return res.status(500).json({ error: 'Error fetching CV data' });
@@ -32,6 +34,7 @@ router.get('/cv', async (req, res) => {
 router.put('/cv', authenticateToken, async (req, res) => {
   try {
     const updated = await updateCvData(req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating CV data' });
@@ -44,6 +47,7 @@ router.put('/cv', authenticateToken, async (req, res) => {
 router.post('/projects', authenticateToken, async (req, res) => {
   try {
     const item = await insertItem('projects', req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
   } catch (err) {
     return res.status(500).json({ error: 'Error creating project' });
@@ -53,6 +57,7 @@ router.post('/projects', authenticateToken, async (req, res) => {
 router.put('/projects/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await updateItem('projects', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating project' });
@@ -62,6 +67,7 @@ router.put('/projects/:id', authenticateToken, async (req, res) => {
 router.delete('/projects/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('projects', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting project' });
@@ -72,6 +78,7 @@ router.delete('/projects/:id', authenticateToken, async (req, res) => {
 router.post('/skills', authenticateToken, async (req, res) => {
   try {
     const item = await insertItem('skills', req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
   } catch (err) {
     return res.status(500).json({ error: 'Error creating skill' });
@@ -81,6 +88,7 @@ router.post('/skills', authenticateToken, async (req, res) => {
 router.put('/skills/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await updateItem('skills', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating skill' });
@@ -90,6 +98,7 @@ router.put('/skills/:id', authenticateToken, async (req, res) => {
 router.delete('/skills/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('skills', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting skill' });
@@ -100,6 +109,7 @@ router.delete('/skills/:id', authenticateToken, async (req, res) => {
 router.post('/experiences', authenticateToken, async (req, res) => {
   try {
     const item = await insertItem('experiences', req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
   } catch (err) {
     return res.status(500).json({ error: 'Error creating experience' });
@@ -109,6 +119,7 @@ router.post('/experiences', authenticateToken, async (req, res) => {
 router.put('/experiences/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await updateItem('experiences', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating experience' });
@@ -118,6 +129,7 @@ router.put('/experiences/:id', authenticateToken, async (req, res) => {
 router.delete('/experiences/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('experiences', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting experience' });
@@ -128,6 +140,7 @@ router.delete('/experiences/:id', authenticateToken, async (req, res) => {
 router.post('/strengths', authenticateToken, async (req, res) => {
   try {
     const item = await insertItem('strengths', req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
   } catch (err) {
     return res.status(500).json({ error: 'Error creating strength' });
@@ -137,6 +150,7 @@ router.post('/strengths', authenticateToken, async (req, res) => {
 router.put('/strengths/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await updateItem('strengths', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating strength' });
@@ -146,6 +160,7 @@ router.put('/strengths/:id', authenticateToken, async (req, res) => {
 router.delete('/strengths/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('strengths', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting strength' });
@@ -158,6 +173,7 @@ router.get('/source-codes', handleGet('source_codes'));
 router.post('/source-codes', authenticateToken, async (req, res) => {
   try {
     const item = await insertItem('source_codes', req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
   } catch (err) {
     return res.status(500).json({ error: 'Error creating source code item' });
@@ -167,6 +183,7 @@ router.post('/source-codes', authenticateToken, async (req, res) => {
 router.put('/source-codes/:id', authenticateToken, async (req, res) => {
   try {
     const updated = await updateItem('source_codes', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating source code item' });
@@ -176,6 +193,7 @@ router.put('/source-codes/:id', authenticateToken, async (req, res) => {
 router.delete('/source-codes/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('source_codes', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting source code item' });
@@ -195,6 +213,7 @@ router.get('/contacts', authenticateToken, async (req, res) => {
 router.delete('/contacts/:id', authenticateToken, async (req, res) => {
   try {
     await deleteItem('contacts', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting contact message' });
