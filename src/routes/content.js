@@ -24,7 +24,6 @@ router.get('/strengths', handleGet('strengths'));
 router.get('/cv', async (req, res) => {
   try {
     const data = await getCvData();
-    broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data });
   } catch (err) {
     return res.status(500).json({ error: 'Error fetching CV data' });
@@ -197,6 +196,39 @@ router.delete('/source-codes/:id', authenticateToken, async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Error deleting source code item' });
+  }
+});
+
+// Free Source Codes CRUD
+router.get('/free-source-codes', handleGet('free_source_codes'));
+
+router.post('/free-source-codes', authenticateToken, async (req, res) => {
+  try {
+    const item = await insertItem('free_source_codes', req.body);
+    broadcastUpdate({ type: 'refresh' });
+    return res.status(201).json({ success: true, data: item });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error creating free source code item' });
+  }
+});
+
+router.put('/free-source-codes/:id', authenticateToken, async (req, res) => {
+  try {
+    const updated = await updateItem('free_source_codes', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error updating free source code item' });
+  }
+});
+
+router.delete('/free-source-codes/:id', authenticateToken, async (req, res) => {
+  try {
+    await deleteItem('free_source_codes', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error deleting free source code item' });
   }
 });
 

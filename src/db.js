@@ -29,7 +29,7 @@ const defaultCvData = {
     },
     {
       category: "Backend & Mobile Development",
-      items: ["Node.js & Express", "Python (FastAPI)", "Java (Android)", "React Native", "PostgreSQL & Prisma ORM", "MongoDB", "RESTful APIs", "Automation Systems"]
+      items: ["Node.js & Express", "Python (FastAPI)", "Java (Android)", "PostgreSQL & Prisma ORM", "MongoDB", "RESTful APIs", "Automation Systems"]
     },
     {
       category: "Databases & Storage",
@@ -179,6 +179,18 @@ const defaultProjects = [
   }
 ];
 
+const defaultFreeSourceCodes = [
+  {
+    id: "f1",
+    title: "Vite Tailwind Dashboard Boilerplate",
+    filename: "vite-tailwind-dashboard.zip",
+    filesize: "4.2 MB",
+    description: "A premium, fully configured React + Vite + Tailwind CSS admin dashboard template. Includes dark mode toggling, custom chart components, and auth layouts.",
+    tech: ["React", "Vite", "Tailwind CSS"],
+    download_link: "https://github.com/anayolico/onetime"
+  }
+];
+
 let memoryDb = {
   projects: defaultProjects,
   skills: [],
@@ -186,6 +198,7 @@ let memoryDb = {
   strengths: [],
   contacts: [],
   source_codes: defaultSourceCodes,
+  free_source_codes: defaultFreeSourceCodes,
   cv: defaultCvData
 };
 
@@ -268,6 +281,17 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS free_source_codes (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        filename TEXT,
+        filesize TEXT,
+        description TEXT NOT NULL,
+        tech JSONB,
+        download_link TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE TABLE IF NOT EXISTS cv (
         id INT PRIMARY KEY DEFAULT 1,
         content JSONB NOT NULL
@@ -288,6 +312,31 @@ async function initDb() {
     `);
 
     await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO NOTHING`, [JSON.stringify(defaultCvData)]);
+
+    // Fetch and migrate existing cv row if exists
+    try {
+      const cvRes = await client.query('SELECT content FROM cv WHERE id=1');
+      if (cvRes.rows.length > 0 && cvRes.rows[0].content) {
+        let cvContent = typeof cvRes.rows[0].content === 'string' ? JSON.parse(cvRes.rows[0].content) : cvRes.rows[0].content;
+        if (cvContent && Array.isArray(cvContent.skills)) {
+          let migrated = false;
+          cvContent.skills = cvContent.skills.map(group => {
+            if (group && (group.category === 'Backend & Mobile Development' || group.category === 'Backend Development')) {
+              const beforeCount = group.items.length;
+              group.items = group.items.filter(item => item !== 'React Native');
+              if (group.items.length !== beforeCount) migrated = true;
+            }
+            return group;
+          });
+          if (migrated) {
+            await client.query('UPDATE cv SET content=$1 WHERE id=1', [JSON.stringify(cvContent)]);
+            console.log('[DB Migration] Removed "React Native" from Backend skills category in database CV.');
+          }
+        }
+      }
+    } catch (migErr) {
+      console.error('[DB Migration Error] Migrating CV database record:', migErr.message);
+    }
 
     client.release();
     console.log('[DB] Simple tables created and database ready.');
@@ -389,6 +438,12 @@ async function insertItem(table, data) {
         [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.price || 15000, data.downloadLink || data.download_link || '#']
       );
       return res.rows[0];
+    } else if (table === 'free_source_codes') {
+      const res = await pool.query(
+        `INSERT INTO free_source_codes (title, filename, filesize, description, tech, download_link) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#']
+      );
+      return res.rows[0];
     }
   } catch (err) {
     console.error(`[DB Error] insertItem(${table}):`, err.message);
@@ -441,6 +496,12 @@ async function updateItem(table, id, data) {
       const res = await pool.query(
         `UPDATE source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, price=$6, download_link=$7 WHERE id=$8 RETURNING *`,
         [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.price, data.downloadLink || data.download_link || '#', id]
+      );
+      return res.rows[0];
+    } else if (table === 'free_source_codes') {
+      const res = await pool.query(
+        `UPDATE free_source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, download_link=$6 WHERE id=$7 RETURNING *`,
+        [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#', id]
       );
       return res.rows[0];
     }
