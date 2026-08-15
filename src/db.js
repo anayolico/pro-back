@@ -21,6 +21,7 @@ const defaultCvData = {
   email: "acnwa1234@gmail.com",
   portfolio: "https://anayolico.name.ng",
   github: "github.com/anayolico",
+  linkedin: "linkedin.com/in/caleb-anayolico-9861a8350",
   summary: "Driven Full-Stack Software Engineer with a clear trajectory of growth, evolving from a design focus to becoming a complete application architect. Proficient across the entire stack—leveraging React.js, Next.js, and React Native for dynamic interfaces, alongside Node.js, Python (FastAPI), and Java for scalable server architectures. Skilled in configuring relational and document databases (PostgreSQL, Prisma ORM, MongoDB, Supabase), integrating local/international payment gateways (Paystack, Flutterwave), and deploying cloud infrastructure. A graduate of NIIT with a Diploma in Software Engineering, and currently an intern at Fowgate, actively applying and refining full-stack skills on enterprise-level applications. Proven track record delivering both client solutions and robust production applications.",
   skills: [
     {
