@@ -15,93 +15,94 @@ let useMemoryFallback = false;
 
 const defaultCvData = {
   fullName: "Caleb Anayolico",
-  title: "Full-Stack Web & Mobile Application Engineer",
+  title: "Full-Stack Web & Mobile Application Engineer | SaaS Builder",
   location: "Port Harcourt, Rivers State, Nigeria",
   phone: "+234 916 558 7681",
   email: "acnwa1234@gmail.com",
   portfolio: "https://anayolico.name.ng",
   github: "github.com/anayolico",
   linkedin: "linkedin.com/in/caleb-anayolico-9861a8350",
-  summary: "Driven Full-Stack Software Engineer with a clear trajectory of growth, evolving from a design focus to becoming a complete application architect. Proficient across the entire stack—leveraging React.js, Next.js, and React Native for dynamic interfaces, alongside Node.js, Python (FastAPI), and Java for scalable server architectures. Skilled in configuring relational and document databases (PostgreSQL, Prisma ORM, MongoDB, Supabase), integrating local/international payment gateways (Paystack, Flutterwave), and deploying cloud infrastructure. A graduate of NIIT with a Diploma in Software Engineering, and currently an intern at Fowgate, actively applying and refining full-stack skills on enterprise-level applications. Proven track record delivering both client solutions and robust production applications.",
+  summary: "Driven Full-Stack & Backend Engineer with hands-on experience designing, shipping, and maintaining production-grade web and mobile applications across fintech, SaaS, and security domains. Strong command of React.js, Next.js, Node.js, Express, Python (FastAPI), React Native, and PostgreSQL (Prisma ORM, Neon DB), paired with cloud deployment experience on Vercel, Render, and AWS (S3). Skilled in configuring relational and document databases, integrating payment gateways (Paystack, Flutterwave), and deploying scalable server infrastructure.",
   skills: [
     {
-      category: "Frontend Development",
-      items: ["React.js", "Next.js", "JavaScript (ES6+)", "HTML5", "CSS3 & Sass", "Tailwind CSS", "Vite", "React Native", "Responsive Web Design", "UI/UX Animations"]
+      category: "Backend & Logic",
+      items: ["Node.js", "Express.js", "Python (FastAPI)", "Java (Android)", "RESTful API Design", "JWT Authentication", "WebSockets", "Automation Systems"]
     },
     {
-      category: "Backend & Mobile Development",
-      items: ["Node.js & Express", "Python (FastAPI)", "Java (Android)", "PostgreSQL & Prisma ORM", "MongoDB", "RESTful APIs", "Automation Systems"]
+      category: "Frontend & Mobile",
+      items: ["React.js", "Next.js", "JavaScript (ES6+)", "HTML5", "CSS3 & Sass", "Tailwind CSS", "Vite", "React Native", "Responsive Web Design", "UI/UX Animations"]
     },
     {
       category: "Databases & Storage",
       items: ["PostgreSQL", "Prisma ORM", "MongoDB", "Supabase", "SQL", "Neon Database"]
     },
     {
-      category: "Integrations & Cloud Services",
-      items: ["Paystack", "Flutterwave", "Stripe", "Vercel", "Render", "Hostinger & VPS", "AWS (S3)", "Supabase/Clerk", "Mailgun & Resend"]
+      category: "Cloud & DevOps",
+      items: ["Vercel", "Render", "Hostinger & VPS", "AWS (S3)", "Docker", "Git & GitHub Actions (CI/CD)", "Postman & API Testing"]
     },
     {
-      category: "DevOps & Developer Tools",
-      items: ["Git & GitHub Actions (CI/CD)", "Postman & API Testing", "Progressive Web Apps (PWA)", "Figma & UI Prototyping", "CloudConvert & Sharp API"]
+      category: "Integrations & Tools",
+      items: ["Paystack", "Flutterwave", "Stripe", "Clerk", "Mailgun & Resend", "CloudConvert & Sharp API", "Figma"]
+    },
+    {
+      category: "AI & Automation",
+      items: ["Google Generative AI (Gemini API)", "OpenAI API", "Prompt Engineering", "Agentic Workflow Integration"]
     }
   ],
   projects: [
     {
-      title: "LuminaConvert",
-      role: "Full-Stack Creator & Architect",
+      title: "Nigeria SecureVote",
+      subtitle: "1st Place Hackathon Winner & Best Security Architecture",
+      tech: "React, Node.js, Python (FastAPI), Neon DB, PWA Offline Sync",
       bullets: [
-        "Engineered an online multi-format image & media conversion workstation with high-speed backend execution pipelines and an integrated AI assistant.",
-        "Integrated React, Vite, Node.js, Express, Prisma ORM, Neon PostgreSQL, Supabase, CloudConvert, Sharp API, Google Generative AI, and Resend."
+        "Engineered an award-winning next-generation cryptographic E-Voting & Identity Ingestion platform for high-security multi-service elections.",
+        "Integrated real-time National Identity (NIMC/NIN) verification & dynamic citizen profile ingestion via Prembly API.",
+        "Built a PWA offline-first resilient vote queue with local cryptographic signing and WebAuthn biometric authorization enforcing single-vote integrity.",
+        "Developed a Python FastAPI fraud detection engine and real-time public transparency audit ledger."
+      ]
+    },
+    {
+      title: "LuminaConvert",
+      subtitle: "Online Media Converter & AI Workstation",
+      tech: "React, Vite, Node.js, Express, Prisma ORM, Neon PostgreSQL, Supabase, Google Generative AI",
+      bullets: [
+        "Engineered an online multi-format image & media conversion workstation with high-speed backend execution pipelines.",
+        "Integrated CloudConvert API, Sharp API, Google Generative AI assistant, and automated Resend transactional email workflows."
       ]
     },
     {
       title: "Mindful Canvas",
-      role: "Full-Stack Developer",
+      subtitle: "Distraction-Free Note-Taking Application",
+      tech: "React, Vite, Node.js, Express, PostgreSQL, Neon DB, Supabase",
       bullets: [
-        "Designed a minimalist note-taking application providing a distraction-free writing environment with secure authentication, real-time auto-saving, and React Markdown parsing.",
-        "Built with React, Vite, Node.js, Express, PostgreSQL, Neon Database, and Supabase."
+        "Designed a minimalist note-taking platform with secure authentication, real-time auto-saving, and React Markdown parsing."
       ]
     },
     {
       title: "Construction Company Web Platform",
-      role: "Full-Stack Developer",
+      subtitle: "Commercial Web Platform & Engineering Flow",
+      tech: "React.js, Node.js, Express, Tailwind CSS",
       bullets: [
         "Designed and engineered a commercial web platform for a Nigerian construction firm using React.js, Node.js, and Tailwind CSS with interactive project galleries and service inquiry flows."
       ]
     },
     {
       title: "Weather Forecast App",
-      role: "Frontend & API Engineer",
+      subtitle: "Real-Time Weather Visualization & API Service",
+      tech: "React, OpenWeather API, CSS Weather Animations",
       bullets: [
         "Developed a real-time weather application with location search, multi-day forecasts, and smooth CSS weather visualizations."
       ]
     }
   ],
-  hackathonProject: {
-    title: "Nigeria SecureVote",
-    awardTitle: "1st Place Hackathon Winner & Best Security Architecture",
-    role: "Lead Architect & Full-Stack Developer",
-    awardImage: "",
-    summary: "Award-winning next-generation cryptographic E-Voting & Identity Ingestion platform engineered for secure, transparent multi-service election processing.",
-    keyFeatures: [
-      "Real-time National Identity (NIMC/NIN) verification & dynamic citizen profile ingestion via Prembly API.",
-      "PWA Offline-First Resilient Vote Queue with local cryptographic signing and auto-reconnection background sync.",
-      "WebAuthn Biometric Authorization (fingerprint / TouchID / FaceID) enforcing strict single-vote integrity.",
-      "Cryptographic Token & Digital PVC Card Generation featuring 6-digit VIN, 16-character security tokens, and QR verification.",
-      "Python FastAPI Fraud Detection Engine & Real-Time Public Transparency Audit Ledger."
-    ],
-    tech: ["React", "Node.js", "Python (FastAPI)", "Neon Database", "PWA Offline Sync"],
-    demoLink: "https://onetime-voter.vercel.app",
-    codeLink: "https://github.com/anayolico/onetime"
-  },
   experience: [
     {
       period: "",
       role: "Full-Stack Software Engineer (Intern)",
       company: "Fowgate",
       bullets: [
-        "Contributing as a Full-Stack Engineer intern building enterprise features, internal application modules, and scaling frontend UI performance using React.js and Next.js.",
-        "Architecting scalable state management solutions, integrating RESTful API endpoints, and optimizing server payload loading speeds."
+        "Building enterprise features, internal application modules, and optimizing frontend performance using React.js and Next.js.",
+        "Architecting scalable state management solutions, integrating RESTful API endpoints, and improving server payload loading speeds."
       ]
     },
     {
@@ -110,7 +111,7 @@ const defaultCvData = {
       company: "Self-Employed / NIIT",
       bullets: [
         "Earned a Diploma in Software Engineering from the National Institute of Information Technology (NIIT).",
-        "Delivered custom software applications across e-commerce and real estate, integrating Paystack and Flutterwave payment gateways and designing PostgreSQL / Prisma schemas."
+        "Delivered custom web and SaaS applications, integrating Paystack and Flutterwave payment gateways and designing normalized PostgreSQL database schemas."
       ]
     },
     {
@@ -119,7 +120,7 @@ const defaultCvData = {
       company: "Freelance Client Work",
       bullets: [
         "Engineered cross-platform mobile applications using React Native and Java (Android).",
-        "Focused on smooth 60fps UI performance, offline data persistence, and native mobile component integrations."
+        "Optimized mobile component render speeds, implemented offline data persistence, and integrated native mobile capabilities."
       ]
     },
     {
@@ -127,7 +128,7 @@ const defaultCvData = {
       role: "UI/UX & Web Designer",
       company: "Independent Client Work",
       bullets: [
-        "Spearheaded user interface research and wireframing using Figma, translating visual designs into clean responsive HTML5/CSS3/JavaScript codebases."
+        "Spearheaded user interface research and wireframing in Figma, translating visual mockups into clean, responsive frontend codebases."
       ]
     }
   ],
@@ -136,12 +137,11 @@ const defaultCvData = {
       degree: "Diploma in Software Engineering",
       institution: "National Institute of Information Technology (NIIT)",
       period: "Graduated"
-    },
-    {
-      degree: "Bachelor of Science (B.Sc.) Candidate — Computer Science / Engineering",
-      institution: "University Degree Program",
-      period: "Graduation Pending"
     }
+  ],
+  certifications: [
+    { title: "Diploma in Software Engineering", issuer: "NIIT", year: "2024" },
+    { title: "Google AI & Web Architecture Fundamentals", issuer: "Google", year: "2024" }
   ]
 };
 
@@ -534,19 +534,42 @@ async function deleteItem(table, id) {
 }
 
 async function getCvData() {
-  if (useMemoryFallback || !pool) {
-    return memoryDb.cv || defaultCvData;
-  }
-  try {
-    const res = await pool.query('SELECT content FROM cv WHERE id=1');
-    if (res.rows.length > 0 && res.rows[0].content) {
-      return typeof res.rows[0].content === 'string' ? JSON.parse(res.rows[0].content) : res.rows[0].content;
+  let cvData = defaultCvData;
+  if (!useMemoryFallback && pool) {
+    try {
+      const res = await pool.query('SELECT content FROM cv WHERE id=1');
+      if (res.rows.length > 0 && res.rows[0].content) {
+        cvData = typeof res.rows[0].content === 'string' ? JSON.parse(res.rows[0].content) : res.rows[0].content;
+      }
+    } catch (err) {
+      console.error('[DB Error] getCvData query:', err.message);
+      cvData = memoryDb.cv || defaultCvData;
     }
-    return defaultCvData;
-  } catch (err) {
-    console.error('[DB Error] getCvData:', err.message);
-    return memoryDb.cv || defaultCvData;
+  } else if (memoryDb.cv) {
+    cvData = memoryDb.cv;
   }
+
+  // Dynamically merge any backend projects from projects table into cvData.projects
+  try {
+    const dbProjects = await getTableData('projects');
+    if (Array.isArray(dbProjects) && dbProjects.length > 0) {
+      const existingTitles = new Set((cvData.projects || []).map(p => (p.title || '').toLowerCase().trim()));
+      const extraProjects = dbProjects
+        .filter(p => p.title && !existingTitles.has(p.title.toLowerCase().trim()))
+        .map(p => ({
+          title: p.title,
+          subtitle: Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || ''),
+          bullets: [p.desc || p.desc_text || 'Showcased software project engineering and production release.']
+        }));
+      if (extraProjects.length > 0) {
+        cvData = { ...cvData, projects: [...(cvData.projects || []), ...extraProjects] };
+      }
+    }
+  } catch (err) {
+    console.error('[DB Error] Merging dynamic projects into CV:', err.message);
+  }
+
+  return cvData;
 }
 
 async function updateCvData(data) {
