@@ -15,8 +15,8 @@ let useMemoryFallback = false;
 
 const defaultCvData = {
   fullName: "Caleb Anayolico",
-  title: "Full-Stack Web & Mobile Application Engineer | Cloud Infrastructure & DevOps | SaaS Products",
-  location: "Port Harcourt, Rivers State, Nigeria",
+  title: "Full-Stack & Backend Engineer | Mobile Application | Cloud Infrastructure & DevOps | SaaS Products",
+  location: "Remote / Nigeria",
   phone: "+234 916 558 7681",
   email: "acnwa1234@gmail.com",
   portfolio: "https://anayolico.name.ng",
@@ -318,7 +318,7 @@ async function initDb() {
       WHERE NOT EXISTS (SELECT 1 FROM projects WHERE LOWER(title) LIKE '%securevote%');
     `);
 
-    await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO NOTHING`, [JSON.stringify(defaultCvData)]);
+    await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET content=$1`, [JSON.stringify(defaultCvData)]);
 
     // Fetch and migrate existing cv row if exists
     try {
@@ -579,6 +579,10 @@ async function getCvData() {
     console.error('[DB Error] Merging dynamic projects into CV:', err.message);
   }
 
+  // Ensure title & location are synced with latest header & location
+  cvData.title = defaultCvData.title;
+  cvData.location = defaultCvData.location;
+
   // Ensure education items have bullet points
   if (Array.isArray(cvData.education)) {
     cvData.education = cvData.education.map(edu => {
@@ -597,6 +601,7 @@ async function getCvData() {
     cvData.certifications = defaultCvData.certifications;
   }
 
+  memoryDb.cv = cvData;
   return cvData;
 }
 
