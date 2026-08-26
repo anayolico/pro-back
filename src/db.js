@@ -15,7 +15,7 @@ let useMemoryFallback = false;
 
 const defaultCvData = {
   fullName: "Caleb Anayolico",
-  title: "Full-Stack Web & Mobile Application Engineer | SaaS Builder",
+  title: "Full-Stack Web & Mobile Application Engineer | Cloud Infrastructure & DevOps | SaaS Products",
   location: "Port Harcourt, Rivers State, Nigeria",
   phone: "+234 916 558 7681",
   email: "acnwa1234@gmail.com",
