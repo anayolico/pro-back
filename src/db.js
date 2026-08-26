@@ -136,12 +136,18 @@ const defaultCvData = {
     {
       degree: "Diploma in Software Engineering",
       institution: "National Institute of Information Technology (NIIT)",
-      period: "Graduated"
+      period: "Graduated",
+      bullets: [
+        "Algorithms, data structures, software engineering principles, and systems design."
+      ]
     }
   ],
   certifications: [
-    { title: "Diploma in Software Engineering", issuer: "NIIT", year: "2024" },
-    { title: "Google AI & Web Architecture Fundamentals", issuer: "Google", year: "2024" }
+    { title: "Google AI Essentials", issuer: "Google" },
+    { title: "AWS AI Practitioner", issuer: "Amazon Web Services" },
+    { title: "LangChain for LLM Application Development", issuer: "DeepLearning.AI" },
+    { title: "Backend Web Development, Python & Django", issuer: "Code Camp" },
+    { title: "Diploma in Software Engineering", issuer: "NIIT" }
   ]
 };
 
@@ -571,6 +577,24 @@ async function getCvData() {
     }
   } catch (err) {
     console.error('[DB Error] Merging dynamic projects into CV:', err.message);
+  }
+
+  // Ensure education items have bullet points
+  if (Array.isArray(cvData.education)) {
+    cvData.education = cvData.education.map(edu => {
+      if (!edu.bullets || edu.bullets.length === 0) {
+        return {
+          ...edu,
+          bullets: ["Algorithms, data structures, software engineering principles, and systems design."]
+        };
+      }
+      return edu;
+    });
+  }
+
+  // Ensure certifications are updated if missing new entries
+  if (!Array.isArray(cvData.certifications) || cvData.certifications.length < 3) {
+    cvData.certifications = defaultCvData.certifications;
   }
 
   return cvData;

@@ -459,11 +459,14 @@
             <label class="text-[11px] font-bold text-gray-400 uppercase">Portfolio Domain</label>
             <input id="cvPortfolio" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
           </div>
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[11px] font-bold text-gray-400 uppercase">GitHub Profile URL</label>
-          <input id="cvGithub" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">GitHub Profile URL</label>
+            <input id="cvGithub" type="text" required class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase">LinkedIn Profile URL</label>
+            <input id="cvLinkedin" type="text" class="w-full p-3 rounded-xl glass-input text-xs">
+          </div>
         </div>
 
         <div class="space-y-1">
@@ -479,8 +482,7 @@
           <div class="space-y-4">
             <div class="flex justify-between items-center">
               <div>
-                <h3 class="text-sm font-bold text-accent-teal uppercase tracking-wider font-display">1. Skills Groups
-                </h3>
+                <h3 class="text-sm font-bold text-accent-teal uppercase tracking-wider font-display">1. Skills Groups</h3>
                 <p class="text-[11px] text-gray-400">Manage technical skill categories and tags for your CV</p>
               </div>
               <button type="button" onclick="addCvSkillGroup()"
@@ -491,105 +493,16 @@
             <div id="cvSkillsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
           </div>
 
-          <!-- 2. HACKATHON AWARD PROJECT SHOWCASE (SPECIAL) -->
+          <!-- 2. PROJECTS SHOWCASE MANAGER -->
           <div class="space-y-4 pt-4 border-t border-white/10">
             <div class="flex justify-between items-center">
               <div>
-                <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider font-display">🏆 Special Hackathon
-                  Award Project</h3>
-                <p class="text-[11px] text-gray-400">Featured award-winning hackathon project & square trophy photo slot
-                </p>
-              </div>
-            </div>
-
-            <div class="glass-card p-5 rounded-2xl space-y-4 border border-amber-400/20">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1">
-                  <label class="text-[10px] font-bold text-gray-400 uppercase">Project Title</label>
-                  <input id="hackathonTitle" type="text" placeholder="Nigeria SecureVote"
-                    class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[10px] font-bold text-amber-400 uppercase">Award Distinction</label>
-                  <input id="hackathonAwardTitle" type="text"
-                    placeholder="1st Place Hackathon Winner & Best Security Architecture"
-                    class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-400">
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[10px] font-bold text-gray-400 uppercase">Your Role</label>
-                  <input id="hackathonRole" type="text" placeholder="Lead Architect & Full-Stack Developer"
-                    class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-purple font-semibold">
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[10px] font-bold text-gray-400 uppercase">GitHub Repository URL</label>
-                  <input id="hackathonCodeLink" type="text" placeholder="https://github.com/anayolico/onetime"
-                    class="w-full px-3 py-2 rounded-xl glass-input text-xs">
-                </div>
-              </div>
-
-              <!-- Square Award Image Upload -->
-              <div class="space-y-2 pt-2 border-t border-white/5">
-                <label class="text-[10px] font-bold text-amber-400 uppercase">Award Trophy / Certificate Picture (Square
-                  Format)</label>
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-24 h-24 rounded-2xl bg-black/40 border border-amber-400/30 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
-                    <img id="hackathonAwardImagePreview" src="" class="w-full h-full object-cover hidden"
-                      onerror="this.classList.add('hidden'); document.getElementById('hackathonAwardPlaceholder').classList.remove('hidden');">
-                    <span id="hackathonAwardPlaceholder"
-                      class="text-[9px] text-amber-400/70 text-center px-1 font-bold">Square Award Photo</span>
-                  </div>
-                  <div class="flex-1 space-y-2">
-                    <label
-                      class="cursor-pointer inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-400 border border-amber-400/30 text-xs font-bold transition-all w-full text-center">
-                      <span>Upload Award Photo to Cloudinary</span>
-                      <input type="file" id="hackathonFileInput" accept="image/*"
-                        onchange="uploadHackathonAwardImage(event)" class="hidden">
-                    </label>
-                    <input id="hackathonAwardImage" type="text"
-                      placeholder="Award Image URL (Paste URL or Upload above)"
-                      oninput="updateHackathonImagePreview(this.value)"
-                      class="w-full p-2.5 rounded-xl glass-input text-xs">
-                    <div id="hackathonUploadProgress" class="hidden text-[11px] text-amber-400 animate-pulse font-bold">
-                      Uploading Award Photo...</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-1">
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Project Overview Summary</label>
-                <textarea id="hackathonSummary" placeholder="Summary..."
-                  class="w-full p-3 rounded-xl glass-input text-xs h-20 leading-relaxed"></textarea>
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-bold text-amber-400 uppercase">Key Technical Features & Security
-                  Highlights</label>
-                <div id="hackathonFeaturesContainer" class="space-y-2"></div>
-                <div class="flex gap-2 pt-1">
-                  <input type="text" id="newHackathonFeature"
-                    placeholder="Add technical highlight (e.g. NIMC NIN integration)..."
-                    onkeydown="if(event.key==='Enter'){event.preventDefault(); addHackathonFeature();}"
-                    class="flex-1 px-3 py-2 rounded-xl glass-input text-xs">
-                  <button type="button" onclick="addHackathonFeature()"
-                    class="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-bold cursor-pointer">+ Add
-                    Highlight</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. PROJECTS SHOWCASE MANAGER -->
-          <div class="space-y-4 pt-4 border-t border-white/10">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="text-sm font-bold text-accent-purple uppercase tracking-wider font-display">3. Projects
-                  Showcase</h3>
-                <p class="text-[11px] text-gray-400">Manage featured projects and accomplishment bullet points</p>
+                <h3 class="text-sm font-bold text-accent-purple uppercase tracking-wider font-display">2. Projects Showcase</h3>
+                <p class="text-[11px] text-gray-400">Manage featured projects, tech stacks, and bullet accomplishments</p>
               </div>
               <button type="button" onclick="addCvProject()"
                 class="px-4 py-2 rounded-xl bg-accent-purple/20 hover:bg-accent-purple/30 text-accent-purple border border-accent-purple/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                <span>+ Add Showcase Project</span>
+                <span>+ Add Project</span>
               </button>
             </div>
             <div id="cvProjectsContainer" class="space-y-4"></div>
@@ -599,14 +512,12 @@
           <div class="space-y-4 pt-4 border-t border-white/10">
             <div class="flex justify-between items-center">
               <div>
-                <h3 class="text-sm font-bold text-accent-cyan uppercase tracking-wider font-display">3. Work Experience
-                  Timeline</h3>
-                <p class="text-[11px] text-gray-400">Manage career positions, companies, dates, and bullet achievements
-                </p>
+                <h3 class="text-sm font-bold text-accent-cyan uppercase tracking-wider font-display">3. Work Experience</h3>
+                <p class="text-[11px] text-gray-400">Manage career positions, companies, dates, and bullet achievements</p>
               </div>
               <button type="button" onclick="addCvExperience()"
                 class="px-4 py-2 rounded-xl bg-accent-cyan/20 hover:bg-accent-cyan/30 text-accent-cyan border border-accent-cyan/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                <span>+ Add Career Experience</span>
+                <span>+ Add Experience</span>
               </button>
             </div>
             <div id="cvExperienceContainer" class="space-y-4"></div>
@@ -616,17 +527,30 @@
           <div class="space-y-4 pt-4 border-t border-white/10">
             <div class="flex justify-between items-center">
               <div>
-                <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider font-display">4. Education Details
-                </h3>
-                <p class="text-[11px] text-gray-400">Manage degree qualifications, university institutions, and study
-                  periods</p>
+                <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider font-display">4. Education Details</h3>
+                <p class="text-[11px] text-gray-400">Manage degree qualifications, institutions, study periods, and bullet points</p>
               </div>
               <button type="button" onclick="addCvEducation()"
                 class="px-4 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-400 border border-amber-400/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                <span>+ Add Education Entry</span>
+                <span>+ Add Education</span>
               </button>
             </div>
             <div id="cvEducationContainer" class="space-y-4"></div>
+          </div>
+
+          <!-- 5. CERTIFICATIONS MANAGER -->
+          <div class="space-y-4 pt-4 border-t border-white/10">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider font-display">5. Certifications & Badges</h3>
+                <p class="text-[11px] text-gray-400">Manage certificates, issuing organizations, and details</p>
+              </div>
+              <button type="button" onclick="addCvCertification()"
+                class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                <span>+ Add Certification</span>
+              </button>
+            </div>
+            <div id="cvCertificationsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
           </div>
 
         </div>
@@ -1105,7 +1029,7 @@
       }
     }
 
-    let cvState = { skills: [], projects: [], experience: [], education: [], hackathonProject: null };
+    let cvState = { skills: [], projects: [], experience: [], education: [], certifications: [] };
 
     async function loadCvData() {
       try {
@@ -1119,6 +1043,7 @@
         document.getElementById('cvEmail').value = cv.email || '';
         document.getElementById('cvPortfolio').value = cv.portfolio || '';
         document.getElementById('cvGithub').value = cv.github || '';
+        if (document.getElementById('cvLinkedin')) document.getElementById('cvLinkedin').value = cv.linkedin || '';
         document.getElementById('cvSummary').value = cv.summary || '';
 
         cvState = {
@@ -1126,134 +1051,16 @@
           projects: Array.isArray(cv.projects) ? cv.projects : [],
           experience: Array.isArray(cv.experience) ? cv.experience : [],
           education: Array.isArray(cv.education) ? cv.education : [],
-          hackathonProject: cv.hackathonProject || {
-            title: "Nigeria SecureVote",
-            awardTitle: "1st Place Hackathon Winner & Best Security Architecture",
-            role: "Lead Architect & Full-Stack Developer",
-            awardImage: "",
-            summary: "Award-winning next-generation cryptographic E-Voting & Identity Ingestion platform engineered for secure, transparent multi-service election processing.",
-            keyFeatures: [
-              "Real-time National Identity (NIMC/NIN) verification & dynamic citizen profile ingestion via Prembly API.",
-              "PWA Offline-First Resilient Vote Queue with local cryptographic signing and auto-reconnection background sync.",
-              "WebAuthn Biometric Authorization (fingerprint / TouchID / FaceID) enforcing strict single-vote integrity.",
-              "Cryptographic Token & Digital PVC Card Generation featuring 6-digit VIN, 16-character security tokens, and QR verification.",
-              "Python FastAPI Fraud Detection Engine & Real-Time Public Transparency Audit Ledger."
-            ],
-            tech: ["React", "Node.js", "Python (FastAPI)", "Neon Database", "PWA Offline Sync"],
-            demoLink: "#",
-            codeLink: "https://github.com/anayolico/onetime"
-          }
+          certifications: Array.isArray(cv.certifications) ? cv.certifications : []
         };
 
         renderCvSkills();
         renderCvProjects();
         renderCvExperience();
         renderCvEducation();
-        renderHackathonProject();
+        renderCvCertifications();
       } catch (err) {
         console.error('Error loading CV data:', err);
-      }
-    }
-
-    function renderHackathonProject() {
-      const h = cvState.hackathonProject || {};
-      if (document.getElementById('hackathonTitle')) document.getElementById('hackathonTitle').value = h.title || '';
-      if (document.getElementById('hackathonAwardTitle')) document.getElementById('hackathonAwardTitle').value = h.awardTitle || '';
-      if (document.getElementById('hackathonRole')) document.getElementById('hackathonRole').value = h.role || '';
-      if (document.getElementById('hackathonCodeLink')) document.getElementById('hackathonCodeLink').value = h.codeLink || '';
-      if (document.getElementById('hackathonAwardImage')) document.getElementById('hackathonAwardImage').value = h.awardImage || '';
-      if (document.getElementById('hackathonSummary')) document.getElementById('hackathonSummary').value = h.summary || '';
-      updateHackathonImagePreview(h.awardImage || '');
-
-      const container = document.getElementById('hackathonFeaturesContainer');
-      if (!container) return;
-      const features = h.keyFeatures || [];
-      container.innerHTML = features.map((feat, fIdx) => `
-        <div class="flex items-start gap-2">
-          <span class="text-amber-400 pt-2 font-bold">•</span>
-          <textarea onchange="cvState.hackathonProject.keyFeatures[${fIdx}] = this.value" class="flex-1 p-2.5 rounded-xl glass-input text-xs leading-relaxed h-16">${feat}</textarea>
-          <button type="button" onclick="removeHackathonFeature(${fIdx})" class="p-2 text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer">✕</button>
-        </div>
-      `).join('');
-    }
-
-    function updateHackathonImagePreview(url) {
-      const img = document.getElementById('hackathonAwardImagePreview');
-      const placeholder = document.getElementById('hackathonAwardPlaceholder');
-      if (!img || !placeholder) return;
-      if (url && url.trim()) {
-        img.src = url;
-        img.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      } else {
-        img.src = '';
-        img.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-      }
-    }
-
-    async function uploadHackathonAwardImage(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-
-      const btn = e.target.closest('label');
-      if (btn) setButtonLoading(btn, true, 'Uploading...');
-      const progressEl = document.getElementById('hackathonUploadProgress');
-      progressEl.innerText = 'Uploading Award Photo to Cloudinary...';
-      progressEl.classList.remove('hidden');
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const headers = {};
-        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers,
-          body: formData
-        });
-
-        const data = await res.json();
-        if (res.ok && data.url) {
-          document.getElementById('hackathonAwardImage').value = data.url;
-          if (!cvState.hackathonProject) cvState.hackathonProject = {};
-          cvState.hackathonProject.awardImage = data.url;
-          updateHackathonImagePreview(data.url);
-          progressEl.innerText = 'Uploaded successfully!';
-          showToast('Award photo uploaded to Cloudinary!', 'success');
-          setTimeout(() => progressEl.classList.add('hidden'), 3000);
-        } else {
-          const errMsg = data.error || 'Failed to upload award photo.';
-          showToast(errMsg, 'error');
-          progressEl.classList.add('hidden');
-        }
-      } catch (err) {
-        console.error('[Award Upload Error]', err);
-        showToast('Upload error. Check server connection.', 'error');
-        progressEl.classList.add('hidden');
-      } finally {
-        if (btn) setButtonLoading(btn, false);
-      }
-    }
-
-    function addHackathonFeature() {
-      const input = document.getElementById('newHackathonFeature');
-      if (!input) return;
-      const val = input.value.trim();
-      if (val) {
-        if (!cvState.hackathonProject.keyFeatures) cvState.hackathonProject.keyFeatures = [];
-        cvState.hackathonProject.keyFeatures.push(val);
-        input.value = '';
-        renderHackathonProject();
-      }
-    }
-
-    function removeHackathonFeature(fIdx) {
-      if (cvState.hackathonProject && cvState.hackathonProject.keyFeatures) {
-        cvState.hackathonProject.keyFeatures.splice(fIdx, 1);
-        renderHackathonProject();
       }
     }
 
@@ -1261,18 +1068,10 @@
       if (e) e.preventDefault();
       const submitBtn = e?.target?.querySelector?.('button[type="submit"]') || document.querySelector('button[onclick="saveCv(event)"]');
       const statusEl = document.getElementById('cvSaveStatus');
-      statusEl.classList.add('hidden');
+      if (statusEl) statusEl.classList.add('hidden');
 
       if (submitBtn) setButtonLoading(submitBtn, true, 'Publishing CV...');
       try {
-        if (!cvState.hackathonProject) cvState.hackathonProject = {};
-        cvState.hackathonProject.title = document.getElementById('hackathonTitle').value;
-        cvState.hackathonProject.awardTitle = document.getElementById('hackathonAwardTitle').value;
-        cvState.hackathonProject.role = document.getElementById('hackathonRole').value;
-        cvState.hackathonProject.codeLink = document.getElementById('hackathonCodeLink').value;
-        cvState.hackathonProject.awardImage = document.getElementById('hackathonAwardImage').value;
-        cvState.hackathonProject.summary = document.getElementById('hackathonSummary').value;
-
         const payload = {
           fullName: document.getElementById('cvFullName').value,
           title: document.getElementById('cvTitle').value,
@@ -1281,20 +1080,23 @@
           email: document.getElementById('cvEmail').value,
           portfolio: document.getElementById('cvPortfolio').value,
           github: document.getElementById('cvGithub').value,
+          linkedin: document.getElementById('cvLinkedin')?.value || '',
           summary: document.getElementById('cvSummary').value,
           skills: cvState.skills,
           projects: cvState.projects,
           experience: cvState.experience,
           education: cvState.education,
-          hackathonProject: cvState.hackathonProject
+          certifications: cvState.certifications
         };
 
         const res = await fetchApi('/api/cv', 'PUT', payload);
         if (res && (res.success || res.fullName)) {
           showToast('CV & Resume changes saved live!', 'success');
-          statusEl.innerText = 'CV updated successfully! Changes are live at /cv';
-          statusEl.classList.remove('hidden');
-          setTimeout(() => statusEl.classList.add('hidden'), 4000);
+          if (statusEl) {
+            statusEl.innerText = 'CV updated successfully! Changes are live at /cv';
+            statusEl.classList.remove('hidden');
+            setTimeout(() => statusEl.classList.add('hidden'), 4000);
+          }
         } else {
           showToast('Failed to save CV changes', 'error');
         }
@@ -1371,20 +1173,24 @@
       const container = document.getElementById('cvProjectsContainer');
       if (!container) return;
       if (cvState.projects.length === 0) {
-        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No showcase projects added yet. Click "+ Add Showcase Project" above.</p>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No showcase projects added yet. Click "+ Add Project" above.</p>`;
         return;
       }
       container.innerHTML = cvState.projects.map((proj, projIdx) => `
         <div class="glass-card p-5 rounded-2xl space-y-4 border border-white/10">
           <div class="flex justify-between items-center gap-2">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
               <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase">Project Title</label>
                 <input type="text" value="${proj.title || ''}" placeholder="Project Title" onchange="cvState.projects[${projIdx}].title = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
               </div>
               <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Your Role</label>
-                <input type="text" value="${proj.role || ''}" placeholder="Role (e.g. Lead Architect & Developer)" onchange="cvState.projects[${projIdx}].role = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-purple font-semibold">
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Subtitle / Award Tagline</label>
+                <input type="text" value="${proj.subtitle || proj.role || ''}" placeholder="Subtitle or Role" onchange="cvState.projects[${projIdx}].subtitle = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-purple font-semibold">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Tech Stack</label>
+                <input type="text" value="${proj.tech || ''}" placeholder="React, Node.js, etc." onchange="cvState.projects[${projIdx}].tech = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-accent-teal">
               </div>
             </div>
             <button type="button" onclick="deleteCvProject(${projIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete Project</button>
@@ -1411,7 +1217,7 @@
     }
 
     function addCvProject() {
-      cvState.projects.push({ title: 'New Showcase Project', role: 'Full-Stack Developer', bullets: ['Built features...'] });
+      cvState.projects.push({ title: 'New Project', subtitle: 'Software Engineering Project', tech: 'React, Node.js', bullets: ['Engineered scalable application...'] });
       renderCvProjects();
     }
 
@@ -1442,7 +1248,7 @@
       const container = document.getElementById('cvExperienceContainer');
       if (!container) return;
       if (cvState.experience.length === 0) {
-        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No experience entries added yet. Click "+ Add Career Experience" above.</p>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No experience entries added yet. Click "+ Add Experience" above.</p>`;
         return;
       }
       container.innerHTML = cvState.experience.map((exp, expIdx) => `
@@ -1517,28 +1323,125 @@
       const container = document.getElementById('cvEducationContainer');
       if (!container) return;
       if (cvState.education.length === 0) {
-        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No education entries added yet. Click "+ Add Education Entry" above.</p>`;
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 text-center">No education entries added yet. Click "+ Add Education" above.</p>`;
         return;
       }
       container.innerHTML = cvState.education.map((edu, eduIdx) => `
-        <div class="glass-card p-4 rounded-2xl border border-white/10 flex justify-between items-center gap-3">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Degree / Qualification</label>
-              <input type="text" value="${edu.degree || ''}" placeholder="Degree (e.g. B.Sc. Computer Science)" onchange="cvState.education[${eduIdx}].degree = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-400">
+        <div class="glass-card p-5 rounded-2xl space-y-4 border border-white/10">
+          <div class="flex justify-between items-center gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Degree / Qualification</label>
+                <input type="text" value="${edu.degree || ''}" placeholder="Degree (e.g. Diploma in Software Engineering)" onchange="cvState.education[${eduIdx}].degree = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-400">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Institution / University</label>
+                <input type="text" value="${edu.institution || ''}" placeholder="University Name" onchange="cvState.education[${eduIdx}].institution = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold text-white">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Period / Status</label>
+                <input type="text" value="${edu.period || ''}" placeholder="Year / Status (e.g. Graduated)" onchange="cvState.education[${eduIdx}].period = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-gray-300">
+              </div>
             </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Institution / University</label>
-              <input type="text" value="${edu.institution || ''}" placeholder="University Name" onchange="cvState.education[${eduIdx}].institution = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold text-white">
+            <button type="button" onclick="deleteCvEducation(${eduIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete Entry</button>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase">Course Details / Highlights</label>
+            <div class="space-y-2">
+              ${(edu.bullets || []).map((bullet, bulletIdx) => `
+                <div class="flex items-start gap-2">
+                  <span class="text-amber-400 pt-2 font-bold">•</span>
+                  <textarea onchange="cvState.education[${eduIdx}].bullets[${bulletIdx}] = this.value" class="flex-1 p-2.5 rounded-xl glass-input text-xs leading-relaxed h-16">${bullet}</textarea>
+                  <button type="button" onclick="removeCvEducationBullet(${eduIdx}, ${bulletIdx})" class="p-2 text-rose-400 hover:text-rose-300 text-xs font-bold cursor-pointer">✕</button>
+                </div>
+              `).join('')}
             </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Period / Year</label>
-              <input type="text" value="${edu.period || ''}" placeholder="Year / Status (e.g. 2020 - 2024)" onchange="cvState.education[${eduIdx}].period = this.value" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-gray-300">
+            <div class="flex gap-2 pt-1">
+              <input type="text" id="newEduBullet_${eduIdx}" placeholder="Add course detail bullet point..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addCvEducationBullet(${eduIdx});}" class="flex-1 px-3 py-2 rounded-xl glass-input text-xs">
+              <button type="button" onclick="addCvEducationBullet(${eduIdx})" class="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-bold cursor-pointer">+ Add Detail</button>
             </div>
           </div>
-          <button type="button" onclick="deleteCvEducation(${eduIdx})" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition-all cursor-pointer">Delete</button>
         </div>
       `).join('');
+    }
+
+    function addCvEducation() {
+      cvState.education.push({ degree: 'Diploma in Software Engineering', institution: 'National Institute of Information Technology (NIIT)', period: 'Graduated', bullets: ['Algorithms, data structures, software engineering principles, and systems design.'] });
+      renderCvEducation();
+    }
+
+    function deleteCvEducation(eduIdx) {
+      cvState.education.splice(eduIdx, 1);
+      renderCvEducation();
+    }
+
+    function addCvEducationBullet(eduIdx) {
+      const input = document.getElementById(`newEduBullet_${eduIdx}`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (val) {
+        if (!cvState.education[eduIdx].bullets) cvState.education[eduIdx].bullets = [];
+        cvState.education[eduIdx].bullets.push(val);
+        input.value = '';
+        renderCvEducation();
+      }
+    }
+
+    function removeCvEducationBullet(eduIdx, bulletIdx) {
+      cvState.education[eduIdx].bullets.splice(bulletIdx, 1);
+      renderCvEducation();
+    }
+
+    // --- CV CERTIFICATIONS MANAGER ---
+    function renderCvCertifications() {
+      const container = document.getElementById('cvCertificationsContainer');
+      if (!container) return;
+      if (cvState.certifications.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-xs py-4 col-span-2 text-center">No certifications added yet. Click "+ Add Certification" above.</p>`;
+        return;
+      }
+      container.innerHTML = cvState.certifications.map((cert, certIdx) => `
+        <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3 relative">
+          <div class="flex justify-between items-center gap-2">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Certification #${certIdx + 1}</span>
+            <button type="button" onclick="deleteCvCertification(${certIdx})" class="text-rose-400 hover:text-rose-300 text-xs font-bold px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 cursor-pointer">Delete</button>
+          </div>
+          <div class="space-y-2">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Certificate Title</label>
+              <input type="text" value="${typeof cert === 'string' ? cert : (cert.title || '')}" placeholder="Title (e.g. Google AI Essentials)" onchange="updateCvCertField(${certIdx}, 'title', this.value)" class="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Issuer / Org</label>
+                <input type="text" value="${typeof cert === 'string' ? '' : (cert.issuer || '')}" placeholder="Issuer (e.g. Google)" onchange="updateCvCertField(${certIdx}, 'issuer', this.value)" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-gray-300">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Year (Optional)</label>
+                <input type="text" value="${typeof cert === 'string' ? '' : (cert.year || '')}" placeholder="Year e.g. 2024" onchange="updateCvCertField(${certIdx}, 'year', this.value)" class="w-full px-3 py-2 rounded-xl glass-input text-xs text-gray-400">
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateCvCertField(certIdx, field, val) {
+      if (typeof cvState.certifications[certIdx] === 'string') {
+        cvState.certifications[certIdx] = { title: cvState.certifications[certIdx], issuer: '', year: '' };
+      }
+      cvState.certifications[certIdx][field] = val;
+    }
+
+    function addCvCertification() {
+      cvState.certifications.push({ title: 'New Certification', issuer: 'Issuer Name', year: '' });
+      renderCvCertifications();
+    }
+
+    function deleteCvCertification(certIdx) {
+      cvState.certifications.splice(certIdx, 1);
+      renderCvCertifications();
     }
 
     function addCvEducation() {
