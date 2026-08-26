@@ -556,11 +556,15 @@ async function getCvData() {
       const existingTitles = new Set((cvData.projects || []).map(p => (p.title || '').toLowerCase().trim()));
       const extraProjects = dbProjects
         .filter(p => p.title && !existingTitles.has(p.title.toLowerCase().trim()))
-        .map(p => ({
-          title: p.title,
-          subtitle: Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || ''),
-          bullets: [p.desc || p.desc_text || 'Showcased software project engineering and production release.']
-        }));
+        .map(p => {
+          const techStr = Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || '');
+          return {
+            title: p.title,
+            subtitle: p.subtitle || techStr || 'Software Engineering Project',
+            tech: techStr,
+            bullets: [p.desc || p.desc_text || 'Showcased software project engineering and production release.']
+          };
+        });
       if (extraProjects.length > 0) {
         cvData = { ...cvData, projects: [...(cvData.projects || []), ...extraProjects] };
       }
