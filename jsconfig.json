@@ -5,5 +5,10 @@
     "target": "ES2021",
     "checkJs": true,
     "allowJs": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "src/admin"
+  ]
 }
+

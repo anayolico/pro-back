@@ -1553,7 +1553,7 @@
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full ${isFeat ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-gray-500'}"></span>
                   <span class="text-[11px] font-bold ${isFeat ? 'text-emerald-300 font-mono' : 'text-gray-400'}">
-                    ${isFeat ? '⭐ Active on Homepage' : 'Hidden from Homepage'}
+                    ${isFeat ? 'Active on Homepage' : 'Hidden from Homepage'}
                   </span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -1875,7 +1875,7 @@
         const currentlyFeatured = state.projects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(id));
         if (currentlyFeatured.length >= 3) {
           if (checkboxEl) checkboxEl.checked = false;
-          showToast('⚠️ Limit reached: You can only have 3 projects active on the homepage at once. Turn off an existing project first.', 'error');
+          showToast('Limit reached: You can only have 3 projects active on the homepage at once. Turn off an existing project first.', 'error');
           return;
         }
       }
@@ -1887,7 +1887,7 @@
           proj.is_featured = isChecked;
           proj.isFeatured = isChecked;
         }
-        showToast(isChecked ? '✨ Project is now active on the homepage!' : 'Project removed from homepage.', 'success');
+        showToast(isChecked ? 'Project is now active on the homepage!' : 'Project removed from homepage.', 'success');
         renderProjects();
       } catch (err) {
         if (checkboxEl) checkboxEl.checked = !isChecked;
@@ -1904,7 +1904,7 @@
       if (isFeat) {
         const currentlyFeatured = state.projects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(id));
         if (currentlyFeatured.length >= 3) {
-          showToast('⚠️ Limit reached: You can only have 3 projects active on the homepage. Turn off another project first.', 'error');
+          showToast('Limit reached: You can only have 3 projects active on the homepage. Turn off another project first.', 'error');
           return;
         }
       }
