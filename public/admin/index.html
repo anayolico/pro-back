@@ -318,8 +318,14 @@
     <section id="section-projects" class="tab-section space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-xl font-bold font-display text-white">Portfolio Projects</h2>
-          <p class="text-xs text-gray-400">Add, edit, or remove showcased projects</p>
+          <div class="flex items-center gap-3">
+            <h2 class="text-xl font-bold font-display text-white">Portfolio Projects</h2>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-accent-teal/15 text-accent-teal border border-accent-teal/30 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Homepage Active: <span id="featActiveCount">0</span>/3
+            </span>
+          </div>
+          <p class="text-xs text-gray-400">Toggle "ON" up to 3 projects to showcase on your homepage. All projects remain visible on /projects.</p>
         </div>
         <button onclick="openModal('projectModal')"
           class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white text-xs font-bold shadow-lg shadow-accent-teal/25 hover:shadow-accent-teal/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer">
@@ -628,6 +634,20 @@
             class="w-full p-3 rounded-xl glass-input text-xs">
           <input id="projCode" type="text" placeholder="GitHub Repository URL"
             class="w-full p-3 rounded-xl glass-input text-xs">
+        </div>
+
+        <!-- Homepage Showcase Option -->
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/10">
+          <div>
+            <p class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>⭐ Showcase on Homepage</span>
+            </p>
+            <p class="text-[10px] text-gray-400">Display this card in the 3 featured slots on your portfolio homepage</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="projIsFeatured" class="sr-only peer">
+            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
         </div>
 
         <div class="flex justify-end gap-3 pt-3 border-t border-white/10">
@@ -987,7 +1007,11 @@
         logout();
         throw new Error('Unauthorized');
       }
-      return await res.json();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed with status ${res.status}`);
+      }
+      return data;
     }
 
     async function loadAllData() {
@@ -1483,14 +1507,22 @@
     }
 
     // --- RENDER FUNCTIONS ---
+    function updateFeaturedBadge() {
+      const activeFeatured = state.projects.filter(p => Boolean(p.is_featured || p.isFeatured));
+      const badgeEl = document.getElementById('featActiveCount');
+      if (badgeEl) badgeEl.innerText = activeFeatured.length;
+    }
+
     function renderProjects() {
       const container = document.getElementById('projectsGrid');
       if (!container) return;
+      updateFeaturedBadge();
       if (state.projects.length === 0) {
         container.innerHTML = `<p class="col-span-3 text-gray-500 text-xs text-center py-8">No projects added yet.</p>`;
         return;
       }
       container.innerHTML = state.projects.map(p => {
+        const isFeat = Boolean(p.is_featured || p.isFeatured);
         const hasValidImage = p.image && p.image.trim().startsWith('http');
         const imgMarkup = hasValidImage
           ? `<img src="${p.image}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-full h-36 object-cover rounded-xl border border-white/5">
@@ -1504,9 +1536,32 @@
         const techArray = Array.isArray(p.tech) ? p.tech : (typeof p.tech === 'string' ? p.tech.split(',') : []);
 
         return `
-          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border transition-all ${isFeat ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10 bg-gradient-to-b from-emerald-950/20 to-slate-900/90' : 'border-white/5'}">
             <div class="space-y-3">
-              ${imgMarkup}
+              <div class="relative">
+                ${imgMarkup}
+                ${isFeat ? `
+                  <div class="absolute top-2 left-2 px-2.5 py-1 rounded-lg bg-emerald-950/90 border border-emerald-400/50 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-[10px] font-extrabold text-emerald-300 uppercase tracking-wider font-mono">Homepage Active</span>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- Feature on Homepage Toggle Switch -->
+              <div class="flex items-center justify-between p-2.5 rounded-xl ${isFeat ? 'bg-emerald-500/15 border border-emerald-500/40' : 'bg-white/[0.03] border border-white/10'} transition-all">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full ${isFeat ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-gray-500'}"></span>
+                  <span class="text-[11px] font-bold ${isFeat ? 'text-emerald-300 font-mono' : 'text-gray-400'}">
+                    ${isFeat ? '⭐ Active on Homepage' : 'Hidden from Homepage'}
+                  </span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" ${isFeat ? 'checked' : ''} onchange="toggleProjectFeature('${p.id}', this.checked, this)" class="sr-only peer">
+                  <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
               <h3 class="font-bold text-white font-display text-base leading-tight">${p.title}</h3>
               <p class="text-xs text-gray-400 line-clamp-2">${p.desc || p.description || ''}</p>
               <div class="flex flex-wrap gap-1">
@@ -1703,6 +1758,7 @@
         document.getElementById('projTech').value = '';
         document.getElementById('projDemo').value = '';
         document.getElementById('projCode').value = '';
+        if (document.getElementById('projIsFeatured')) document.getElementById('projIsFeatured').checked = false;
         if (document.getElementById('projectModalTitle')) document.getElementById('projectModalTitle').innerText = 'Add Project';
         if (document.getElementById('projFileInput')) document.getElementById('projFileInput').value = '';
         updateImagePreview('');
@@ -1814,17 +1870,53 @@
       }
     }
 
+    async function toggleProjectFeature(id, isChecked, checkboxEl) {
+      if (isChecked) {
+        const currentlyFeatured = state.projects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(id));
+        if (currentlyFeatured.length >= 3) {
+          if (checkboxEl) checkboxEl.checked = false;
+          showToast('⚠️ Limit reached: You can only have 3 projects active on the homepage at once. Turn off an existing project first.', 'error');
+          return;
+        }
+      }
+
+      try {
+        await fetchApi(`/api/projects/${id}/feature`, 'PATCH', { is_featured: isChecked });
+        const proj = state.projects.find(p => String(p.id) === String(id));
+        if (proj) {
+          proj.is_featured = isChecked;
+          proj.isFeatured = isChecked;
+        }
+        showToast(isChecked ? '✨ Project is now active on the homepage!' : 'Project removed from homepage.', 'success');
+        renderProjects();
+      } catch (err) {
+        if (checkboxEl) checkboxEl.checked = !isChecked;
+        showToast(err.message || 'Error updating homepage status', 'error');
+      }
+    }
+
     async function saveProject(e) {
       e.preventDefault();
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const id = document.getElementById('projId').value;
+      const isFeat = document.getElementById('projIsFeatured') ? document.getElementById('projIsFeatured').checked : false;
+
+      if (isFeat) {
+        const currentlyFeatured = state.projects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(id));
+        if (currentlyFeatured.length >= 3) {
+          showToast('⚠️ Limit reached: You can only have 3 projects active on the homepage. Turn off another project first.', 'error');
+          return;
+        }
+      }
+
       const payload = {
         title: document.getElementById('projTitle').value,
         desc: document.getElementById('projDesc').value,
         image: document.getElementById('projImage').value,
         tech: document.getElementById('projTech').value.split(',').map(t => t.trim()),
         demoLink: document.getElementById('projDemo').value,
-        codeLink: document.getElementById('projCode').value
+        codeLink: document.getElementById('projCode').value,
+        is_featured: isFeat
       };
       setButtonLoading(submitBtn, true, 'Saving...');
       try {
@@ -1838,7 +1930,7 @@
         closeModal('projectModal');
         loadAllData();
       } catch (err) {
-        showToast('Error saving project', 'error');
+        showToast(err.message || 'Error saving project', 'error');
       } finally {
         setButtonLoading(submitBtn, false);
       }
@@ -1854,6 +1946,9 @@
       document.getElementById('projTech').value = Array.isArray(p.tech) ? p.tech.join(', ') : (p.tech || '');
       document.getElementById('projDemo').value = p.demoLink || p.demo_link || '';
       document.getElementById('projCode').value = p.codeLink || p.code_link || '';
+      if (document.getElementById('projIsFeatured')) {
+        document.getElementById('projIsFeatured').checked = Boolean(p.is_featured || p.isFeatured);
+      }
       if (document.getElementById('projectModalTitle')) document.getElementById('projectModalTitle').innerText = 'Edit Project';
       updateImagePreview(p.image || '');
       document.getElementById('projectModal').classList.remove('hidden');
@@ -1866,7 +1961,7 @@
         showToast('Project deleted successfully!', 'success');
         loadAllData();
       } catch (err) {
-        showToast('Error deleting project', 'error');
+        showToast(err.message || 'Error deleting project', 'error');
         if (btn) setButtonLoading(btn, false);
       }
     }

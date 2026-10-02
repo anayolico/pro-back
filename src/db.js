@@ -182,7 +182,8 @@ const defaultProjects = [
     image: "/media__1786134354519.png",
     tech: ["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"],
     demo_link: "https://nigeria-secure-vote.vercel.app",
-    code_link: "https://github.com/anayolico/onetime"
+    code_link: "https://github.com/anayolico/onetime",
+    is_featured: true
   }
 ];
 
@@ -239,6 +240,7 @@ async function initDb() {
         tech JSONB,
         demo_link TEXT,
         code_link TEXT,
+        is_featured BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -307,14 +309,29 @@ async function initDb() {
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS image TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS desc_text TEXT;
+      ALTER TABLE projects ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS desc_text TEXT;
     `);
 
+    // Ensure initial top 3 projects are featured if none are currently set to featured
+    try {
+      const featCountRes = await client.query('SELECT COUNT(*) FROM projects WHERE is_featured = TRUE');
+      if (parseInt(featCountRes.rows[0].count, 10) === 0) {
+        await client.query(`
+          UPDATE projects SET is_featured = TRUE 
+          WHERE id IN (SELECT id FROM projects ORDER BY id ASC LIMIT 3)
+        `);
+        console.log('[DB Migration] Set top 3 existing projects to is_featured = TRUE.');
+      }
+    } catch (fErr) {
+      console.error('[DB Migration Warning] Checking featured projects:', fErr.message);
+    }
+
     // Ensure Nigeria SecureVote exists in projects table
     await client.query(`
-      INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link)
-      SELECT 'Nigeria SecureVote', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', '/media__1786134354519.png', '["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"]'::jsonb, 'https://nigeria-secure-vote.vercel.app', 'https://github.com/anayolico/onetime'
+      INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link, is_featured)
+      SELECT 'Nigeria SecureVote', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', '/media__1786134354519.png', '["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"]'::jsonb, 'https://nigeria-secure-vote.vercel.app', 'https://github.com/anayolico/onetime', true
       WHERE NOT EXISTS (SELECT 1 FROM projects WHERE LOWER(title) LIKE '%securevote%');
     `);
 
@@ -388,6 +405,10 @@ async function getTableData(table) {
       if (row.download_link) {
         row.downloadLink = row.download_link;
       }
+      if (table === 'projects') {
+        row.is_featured = Boolean(row.is_featured);
+        row.isFeatured = Boolean(row.is_featured);
+      }
       rows.push(row);
     });
 
@@ -400,7 +421,8 @@ async function getTableData(table) {
 
 async function insertItem(table, data) {
   if (useMemoryFallback || !pool) {
-    const newItem = { id: String(Date.now()), ...data, created_at: new Date().toISOString() };
+    const isFeat = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : false);
+    const newItem = { id: String(Date.now()), ...data, is_featured: isFeat, isFeatured: isFeat, created_at: new Date().toISOString() };
     if (!memoryDb[table]) memoryDb[table] = [];
     memoryDb[table].push(newItem);
     return newItem;
@@ -409,11 +431,17 @@ async function insertItem(table, data) {
   try {
     if (table === 'projects') {
       const descVal = data.desc || data.desc_text || '';
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : false);
       const res = await pool.query(
-        `INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link) VALUES ($1, $2, $2, $3, $4, $5, $6) RETURNING *`,
-        [data.title || '', descVal, data.image || '', JSON.stringify(data.tech || []), data.demoLink || data.demo_link || '#', data.codeLink || data.code_link || '#']
+        `INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link, is_featured) VALUES ($1, $2, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [data.title || '', descVal, data.image || '', JSON.stringify(data.tech || []), data.demoLink || data.demo_link || '#', data.codeLink || data.code_link || '#', isFeatured]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) {
+        row.is_featured = Boolean(row.is_featured);
+        row.isFeatured = Boolean(row.is_featured);
+      }
+      return row;
     } else if (table === 'skills') {
       const res = await pool.query(
         `INSERT INTO skills (name, level, category) VALUES ($1, $2, $3) RETURNING *`,
@@ -454,7 +482,8 @@ async function insertItem(table, data) {
     }
   } catch (err) {
     console.error(`[DB Error] insertItem(${table}):`, err.message);
-    const newItem = { id: String(Date.now()), ...data, created_at: new Date().toISOString() };
+    const isFeat = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : false);
+    const newItem = { id: String(Date.now()), ...data, is_featured: isFeat, isFeatured: isFeat, created_at: new Date().toISOString() };
     if (!memoryDb[table]) memoryDb[table] = [];
     memoryDb[table].push(newItem);
     return newItem;
@@ -467,6 +496,13 @@ async function updateItem(table, id, data) {
     const idx = list.findIndex(item => String(item.id) === String(id));
     if (idx !== -1) {
       list[idx] = { ...list[idx], ...data };
+      if (data.is_featured !== undefined) {
+        list[idx].is_featured = Boolean(data.is_featured);
+        list[idx].isFeatured = Boolean(data.is_featured);
+      } else if (data.isFeatured !== undefined) {
+        list[idx].is_featured = Boolean(data.isFeatured);
+        list[idx].isFeatured = Boolean(data.isFeatured);
+      }
       return list[idx];
     }
     return null;
@@ -474,12 +510,26 @@ async function updateItem(table, id, data) {
 
   try {
     if (table === 'projects') {
-      const descVal = data.desc || data.desc_text || '';
+      const currentRes = await pool.query('SELECT * FROM projects WHERE id=$1', [id]);
+      const current = currentRes.rows[0];
+      const title = data.title !== undefined ? data.title : (current ? current.title : '');
+      const descVal = data.desc !== undefined ? data.desc : (data.desc_text !== undefined ? data.desc_text : (current ? (current.desc || current.desc_text || '') : ''));
+      const image = data.image !== undefined ? data.image : (current ? current.image : '');
+      const tech = data.tech !== undefined ? (typeof data.tech === 'string' ? data.tech : JSON.stringify(data.tech)) : (current ? (typeof current.tech === 'string' ? current.tech : JSON.stringify(current.tech || [])) : '[]');
+      const demoLink = data.demoLink !== undefined ? data.demoLink : (data.demo_link !== undefined ? data.demo_link : (current ? (current.demo_link || current.demoLink || '#') : '#'));
+      const codeLink = data.codeLink !== undefined ? data.codeLink : (data.code_link !== undefined ? data.code_link : (current ? (current.code_link || current.codeLink || '#') : '#'));
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : (current ? Boolean(current.is_featured) : false));
+
       const res = await pool.query(
-        `UPDATE projects SET title=$1, "desc"=$2, desc_text=$2, image=$3, tech=$4, demo_link=$5, code_link=$6 WHERE id=$7 RETURNING *`,
-        [data.title, descVal, data.image, JSON.stringify(data.tech || []), data.demoLink || data.demo_link || '#', data.codeLink || data.code_link || '#', id]
+        `UPDATE projects SET title=$1, "desc"=$2, desc_text=$2, image=$3, tech=$4, demo_link=$5, code_link=$6, is_featured=$7 WHERE id=$8 RETURNING *`,
+        [title, descVal, image, tech, demoLink, codeLink, isFeatured, id]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) {
+        row.is_featured = Boolean(row.is_featured);
+        row.isFeatured = Boolean(row.is_featured);
+      }
+      return row;
     } else if (table === 'skills') {
       const res = await pool.query(
         `UPDATE skills SET name=$1, level=$2, category=$3 WHERE id=$4 RETURNING *`,

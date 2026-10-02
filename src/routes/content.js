@@ -45,6 +45,16 @@ router.put('/cv', authenticateToken, async (req, res) => {
 // Projects CRUD
 router.post('/projects', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : false);
+    if (isFeat) {
+      const allProjects = await getTableData('projects');
+      const activeFeatured = allProjects.filter(p => Boolean(p.is_featured || p.isFeatured));
+      if (activeFeatured.length >= 3) {
+        return res.status(400).json({
+          error: 'Limit reached: A maximum of 3 projects can be active on the homepage at once. Please turn off another project first.'
+        });
+      }
+    }
     const item = await insertItem('projects', req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
@@ -55,11 +65,52 @@ router.post('/projects', authenticateToken, async (req, res) => {
 
 router.put('/projects/:id', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : undefined);
+    if (isFeat === true) {
+      const allProjects = await getTableData('projects');
+      const activeFeatured = allProjects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(req.params.id));
+      if (activeFeatured.length >= 3) {
+        return res.status(400).json({
+          error: 'Limit reached: A maximum of 3 projects can be active on the homepage at once. Please turn off another project first.'
+        });
+      }
+    }
     const updated = await updateItem('projects', req.params.id, req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating project' });
+  }
+});
+
+// Dedicated endpoint to toggle featured homepage status
+router.patch('/projects/:id/feature', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_featured, isFeatured } = req.body;
+    const targetState = is_featured !== undefined ? Boolean(is_featured) : Boolean(isFeatured);
+
+    const allProjects = await getTableData('projects');
+    const project = allProjects.find(p => String(p.id) === String(id));
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    if (targetState) {
+      const activeFeatured = allProjects.filter(p => Boolean(p.is_featured || p.isFeatured) && String(p.id) !== String(id));
+      if (activeFeatured.length >= 3) {
+        return res.status(400).json({
+          error: 'Limit reached: A maximum of 3 projects can be active on the homepage at once. Please turn off another project first.'
+        });
+      }
+    }
+
+    const updated = await updateItem('projects', id, { is_featured: targetState, isFeatured: targetState });
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true, data: updated, is_featured: targetState, isFeatured: targetState });
+  } catch (err) {
+    console.error('[Error toggling project feature]', err);
+    return res.status(500).json({ error: 'Error updating project featured status' });
   }
 });
 
