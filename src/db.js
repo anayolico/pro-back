@@ -154,10 +154,10 @@ const defaultCvData = {
 const defaultSourceCodes = [
   {
     id: "1",
-    title: "MR Bayo AI Agent Source Code",
-    filename: "mr-bayo.zip",
+    title: "CaleByte AI Agent Source Code",
+    filename: "calebyte-ai.zip",
     filesize: "10.1 MB",
-    description: "Includes the complete Mr. Bayo AI Agent source code, project structure, setup requirements, and everything you need to run and understand the system.",
+    description: "Includes the complete CaleByte AI Agent source code, project structure, setup requirements, and everything you need to run and understand the system.",
     tech: ["Python", "FastAPI", "AI Agents", "React"],
     price: 15000,
     download_link: "#"
