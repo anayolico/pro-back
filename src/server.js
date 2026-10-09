@@ -17,6 +17,7 @@ const { router: authRouter } = require('./routes/auth');
 const contactRouter = require('./routes/contact');
 const contentRouter = require('./routes/content');
 const uploadRouter = require('./routes/upload');
+const paymentRouter = require('./routes/payment');
 const { sseHandler } = require('./sse');
 
 const app = express();
@@ -40,7 +41,12 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    // @ts-ignore - IncomingMessage does not define rawBody by default; attached for webhook HMAC verification
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Real-Time Terminal Endpoint Logger Middleware
@@ -91,6 +97,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/contacts', contactRouter); // Alias for compatibility
+app.use('/api/paystack', paymentRouter);
+app.use('/api/download', paymentRouter);
 app.use('/api', contentRouter);
 
 // Admin dashboard route redirect
