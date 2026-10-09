@@ -3,7 +3,6 @@ const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { initializeTransaction, verifyTransaction, verifyWebhookSignature } = require('../services/paystack');
-const { sendSourceCodeDeliveryEmail, sendSupportThankYouEmail, sendAdminPaymentAlert } = require('../services/email');
 const { getTableData } = require('../db');
 
 const router = express.Router();
@@ -35,16 +34,9 @@ function getFrontendUrl() {
 }
 
 /**
- * Helper to map projects & prices
+ * Helper to get project details directly from the database source_codes table
  */
 async function resolveProjectDetails(projectId) {
-  const defaultMap = {
-    '1': { id: '1', title: 'CaleByte AI Agent Source Code', filename: 'calebyte-ai.zip', price: 15000 },
-    'calebyte-ai': { id: '1', title: 'CaleByte AI Agent Source Code', filename: 'calebyte-ai.zip', price: 15000 },
-    '2': { id: '2', title: 'Browser Cookie & Key Decryption Engine', filename: 'Browser Decryption.zip', price: 15000 },
-    'cookie-decryption': { id: '2', title: 'Browser Cookie & Key Decryption Engine', filename: 'Browser Decryption.zip', price: 15000 }
-  };
-
   try {
     const list = await getTableData('source_codes');
     if (Array.isArray(list) && list.length > 0) {
@@ -52,20 +44,18 @@ async function resolveProjectDetails(projectId) {
       if (match) {
         return {
           id: match.id,
-          title: match.title || 'Source Code Package',
-          filename: match.filename || `project-${match.id}.zip`,
-          price: Number(match.price) || 15000
+          title: match.title,
+          filename: match.filename,
+          price: Number(match.price) || 0,
+          download_link: match.download_link || match.downloadLink || ''
         };
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('[DB Error in resolveProjectDetails]:', e.message);
+  }
 
-  return defaultMap[projectId] || {
-    id: projectId || 'custom',
-    title: 'CaleByte Source Code Package',
-    filename: 'source-code.zip',
-    price: 15000
-  };
+  return null;
 }
 
 /**
@@ -88,13 +78,17 @@ router.post('/initialize', async (req, res) => {
 
     if (isSourceCode) {
       const project = await resolveProjectDetails(projectId);
-      finalAmountInKobo = project.price * 100; // NGN to Kobo
+      if (!project) {
+        return res.status(404).json({ success: false, error: 'Source code project not found in database.' });
+      }
+      finalAmountInKobo = (project.price || 15000) * 100; // NGN to Kobo
       referencePrefix = 'CB_SRC';
       metadata = {
         type: 'source_code',
         projectId: project.id,
         projectTitle: project.title,
         filename: project.filename,
+        download_link: project.download_link,
         buyerEmail: email.trim(),
         priceNgn: project.price,
         custom_fields: [
@@ -173,25 +167,13 @@ router.get('/verify/:reference', async (req, res) => {
 
     if (isSourceCode) {
       const project = await resolveProjectDetails(metadata.projectId);
-      const token = jwt.sign(
-        {
-          reference: tx.reference,
-          projectId: project.id,
-          projectTitle: project.title,
-          filename: project.filename,
-          email: tx.customer?.email || metadata.buyerEmail,
-          exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
-        },
-        DOWNLOAD_SECRET
-      );
-
-      const downloadUrl = `${backendBase}/api/download/source-code?token=${token}`;
+      const downloadUrl = project?.download_link || metadata.download_link || metadata.downloadLink || '';
 
       return res.json({
         success: true,
         verified: true,
         type: 'source_code',
-        projectTitle: project.title,
+        projectTitle: project?.title || metadata.projectTitle || 'Source Code Package',
         amount: (tx.amount || 0) / 100,
         email: tx.customer?.email || metadata.buyerEmail,
         reference: tx.reference,
@@ -238,74 +220,15 @@ router.post('/webhook', async (req, res) => {
   const eventData = req.body;
   if (eventData && eventData.event === 'charge.success') {
     const data = eventData.data || {};
-    const metadata = data.metadata || {};
     const reference = data.reference;
-    const email = data.customer?.email || metadata.buyerEmail || metadata.supporterEmail;
     const amount = (data.amount || 0) / 100;
-    const backendBase = process.env.BACKEND_URL || 'https://calebyte-tech.onrender.com';
 
     console.log(`[Paystack Webhook] Verified payment of ₦${amount} (Ref: ${reference})`);
-
-    try {
-      if (metadata.type === 'source_code') {
-        const project = await resolveProjectDetails(metadata.projectId);
-        const token = jwt.sign(
-          {
-            reference,
-            projectId: project.id,
-            projectTitle: project.title,
-            filename: project.filename,
-            email,
-            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60)
-          },
-          DOWNLOAD_SECRET
-        );
-
-        const downloadUrl = `${backendBase}/api/download/source-code?token=${token}`;
-
-        // Send customer delivery email
-        await sendSourceCodeDeliveryEmail({
-          email,
-          projectTitle: project.title,
-          downloadUrl,
-          reference,
-          amount
-        });
-
-        // Send Caleb notification
-        await sendAdminPaymentAlert({
-          type: 'source_code',
-          amount,
-          email,
-          reference,
-          details: project.title
-        });
-      } else if (metadata.type === 'support') {
-        // Send supporter thank you
-        await sendSupportThankYouEmail({
-          email,
-          supporterName: metadata.supporterName,
-          amount,
-          reference
-        });
-
-        // Send Caleb donation alert
-        await sendAdminPaymentAlert({
-          type: 'support',
-          amount,
-          email,
-          reference,
-          details: `Donation from ${metadata.supporterName || 'Supporter'}`
-        });
-      }
-    } catch (deliveryErr) {
-      console.error('[Webhook Fulfillment Error]', deliveryErr.message);
-    }
   }
 });
 
 /**
- * 4. GET /api/download/source-code (Secure Token-Protected ZIP Download)
+ * 4. GET /api/download/source-code (Secure Redirect to Google Drive or Local ZIP)
  */
 router.get('/source-code', (req, res) => {
   const { token } = req.query;
@@ -314,7 +237,7 @@ router.get('/source-code', (req, res) => {
     return res.status(401).send('<h1>401 Unauthorized</h1><p>Missing download token.</p>');
   }
 
-  jwt.verify(token, DOWNLOAD_SECRET, (err, decoded) => {
+  jwt.verify(token, DOWNLOAD_SECRET, async (err, decoded) => {
     if (err || !decoded || typeof decoded === 'string') {
       return res.status(403).send(`
         <div style="font-family: sans-serif; padding: 40px; text-align: center; background: #0c0f17; color: #fff;">
@@ -323,6 +246,13 @@ router.get('/source-code', (req, res) => {
           <p style="color: #94a3b8;">Please reply to your order confirmation email or contact <a href="mailto:acnwa1234@gmail.com" style="color: #17a2b8;">acnwa1234@gmail.com</a> with your order reference to refresh your download link.</p>
         </div>
       `);
+    }
+
+    // Direct redirect to database Google Drive link
+    const project = await resolveProjectDetails(decoded.projectId);
+    const driveLink = project?.download_link || decoded.download_link;
+    if (driveLink && driveLink !== '#' && driveLink.startsWith('http')) {
+      return res.redirect(driveLink);
     }
 
     const filename = decoded.filename || 'source-code.zip';
@@ -334,27 +264,12 @@ router.get('/source-code', (req, res) => {
       return res.download(filePath, filename);
     }
 
-    // Graceful fallback if file is not yet dropped into storage folder
-    const fallbackReadme = `
-========================================================================
-           ${decoded.projectTitle || 'CaleByte Technologies Codebase'}
-========================================================================
-Order Reference: ${decoded.reference}
-Purchased by:    ${decoded.email}
-Delivered by:    CaleByte Technologies (Caleb Anayolico)
-
-Thank you for purchasing!
-Your codebase download package is being synchronized. 
-If your download does not start automatically, please email:
-acnwa1234@gmail.com with Reference: ${decoded.reference}
-
-Official Developer Portfolio: https://anayolico.name.ng
-========================================================================
-    `.trim();
-
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${decoded.projectId || 'calebyte'}-order-receipt.txt"`);
-    return res.send(fallbackReadme);
+    return res.status(404).send(`
+      <div style="font-family: sans-serif; padding: 40px; text-align: center; background: #0c0f17; color: #fff;">
+        <h2 style="color: #f87171;">Download Link Unavailable</h2>
+        <p style="color: #94a3b8;">Please contact <a href="mailto:acnwa1234@gmail.com" style="color: #17a2b8;">acnwa1234@gmail.com</a> with Reference: ${decoded.reference}.</p>
+      </div>
+    `);
   });
 });
 

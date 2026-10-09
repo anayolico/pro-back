@@ -59,10 +59,10 @@ app.use((req, res, next) => {
     const status = res.statusCode;
 
     let icon = '📡';
-    if (method === 'DELETE') icon = '🗑️  [DELETED]';
-    else if (method === 'POST') icon = '➕ [CREATED]';
-    else if (method === 'PUT' || method === 'PATCH') icon = '✏️  [UPDATED]';
-    else if (method === 'GET') icon = '🔍 [FETCHED]';
+    if (method === 'DELETE') icon = '[DELETED]';
+    else if (method === 'POST') icon = '[CREATED]';
+    else if (method === 'PUT' || method === 'PATCH') icon = '[UPDATED]';
+    else if (method === 'GET') icon = '[FETCHED]';
 
     console.log(`[API HIT] ${icon} ${method} ${url} -> Status ${status} (${duration}ms)`);
   });
