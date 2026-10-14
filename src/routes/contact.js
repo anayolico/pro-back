@@ -101,7 +101,7 @@ router.post('/', async (req, res) => {
 
         const emailTemplate = `
           <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px;">
-            <h2 style="color: #0d9488; margin-bottom: 20px;">New Message from Portfolio Website</h2>
+            <h2 style="color: #17a2b8; margin-bottom: 20px;">New Message from Portfolio Website</h2>
             <p><strong>Sender Name:</strong> ${fullName}</p>
             <p><strong>Sender Email:</strong> <a href="mailto:${email}">${email}</a></p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />

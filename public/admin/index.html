@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
     rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -19,18 +19,59 @@
       theme: {
         extend: {
           colors: {
-            brand: { dark: '#080c14', card: 'rgba(15, 22, 36, 0.75)', border: 'rgba(255, 255, 255, 0.08)' },
-            accent: { teal: '#0d9488', purple: '#8b5cf6', cyan: '#06b6d4', rose: '#f43f5e' }
+            'brand-navy': '#0B2046',
+            'accent-teal': '#17A2B8',
+            'accent-purple': '#6A5ACD',
+            'bg-body': '#0c0f17',
+            'bg-surface': '#151923',
+            'text-main': '#F6F5F2',
+            'text-muted': '#A0AEC0',
+            brand: {
+              navy: '#0B2046',
+              dark: '#0c0f17',
+              surface: '#151923',
+              card: 'rgba(21, 25, 35, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)'
+            },
+            accent: {
+              teal: '#17A2B8',
+              purple: '#6A5ACD',
+              cyan: '#06b6d4',
+              rose: '#f43f5e'
+            }
           },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            display: ['Outfit', 'sans-serif']
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Outfit', 'system-ui', 'sans-serif']
           }
         }
       }
     }
   </script>
   <style>
+    :root {
+      /* Brand Identity */
+      --color-brand-navy: #0B2046;
+      --color-brand-navy-rgb: 11, 32, 70;
+      
+      /* Interactive Accents */
+      --color-accent-teal: #17A2B8;
+      --color-accent-teal-rgb: 23, 162, 184;
+      --color-accent-purple: #6A5ACD;
+      --color-accent-purple-rgb: 106, 90, 205;
+      
+      /* Dark Theme Surface Colors */
+      --bg-body: #080a11;
+      --bg-surface: #151923;
+      --text-main: #F6F5F2;
+      --text-muted: #A0AEC0;
+      
+      /* UI Element Defaults */
+      --btn-primary-bg: var(--color-accent-teal);
+      --btn-primary-hover: var(--color-accent-purple);
+      --btn-text: #FFFFFF;
+    }
+
     html,
     body {
       overflow-x: hidden;
@@ -39,40 +80,47 @@
     }
 
     body {
-      background: #080c14;
+      background-color: #080a11;
       background-image:
-        radial-gradient(at 0% 0%, rgba(13, 148, 136, 0.18) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.18) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+        radial-gradient(circle at 85% 10%, rgba(23, 162, 184, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 15% 25%, rgba(106, 90, 205, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(11, 32, 70, 0.35) 0%, transparent 60%),
+        radial-gradient(circle at 75% 85%, rgba(23, 162, 184, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 20% 90%, rgba(106, 90, 205, 0.10) 0%, transparent 50%);
       background-attachment: fixed;
-      color: #f3f4f6;
+      color: #F6F5F2;
     }
 
     .glass-card {
-      background: rgba(15, 22, 36, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      background: radial-gradient(ellipse 95% 70% at 50% 0%, #202737 0%, #131722 55%, #0a0d14 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.12);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .glass-card:hover {
-      border-color: rgba(13, 148, 136, 0.3);
-      box-shadow: 0 20px 40px -10px rgba(13, 148, 136, 0.15);
+      border-color: rgba(23, 162, 184, 0.4);
+      box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(23, 162, 184, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.18);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
+      color: #F6F5F2;
       outline: none;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .glass-input:focus {
-      border-color: #0d9488;
-      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+      border-color: #17A2B8;
+      box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.25), 0 0 15px rgba(23, 162, 184, 0.15);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .glass-input::placeholder {
+      color: #64748b;
     }
 
     /* Toast Animations */
@@ -130,9 +178,9 @@
   <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
   </div>
 
-  <!-- TOP RESPONSIVE HEADER -->
-  <header
-    class="border-b border-white/10 glass-card sticky top-0 z-40 px-4 md:px-8 py-3 flex items-center justify-between">
+  <!-- TOP RESPONSIVE HEADER (Authenticated Dashboard Only) -->
+  <header id="adminNavbar"
+    class="hidden sticky top-3 z-40 max-w-7xl w-[calc(100%-2rem)] mx-auto px-4 md:px-8 py-3 rounded-2xl border border-white/10 glass-card shadow-2xl flex items-center justify-between transition-all">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-accent-teal to-accent-purple flex items-center justify-center text-white font-display font-black text-xs shadow-md shadow-accent-teal/20">
         CB
@@ -153,7 +201,7 @@
 
       <!-- Logout Button (Desktop) -->
       <button id="logoutBtn" onclick="logout()"
-        class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold transition-all cursor-pointer">
+        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold transition-all cursor-pointer">
         Logout
       </button>
 
@@ -169,7 +217,7 @@
 
   <!-- MOBILE NAVIGATION DRAWER -->
   <div id="mobileDrawer"
-    class="hidden md:hidden fixed inset-x-0 top-[70px] z-50 bg-[#0f1624]/95 backdrop-blur-2xl border-b border-white/10 p-4 space-y-3 shadow-2xl max-h-[calc(100vh-75px)] overflow-y-auto">
+    class="hidden md:hidden fixed inset-x-4 top-[72px] z-50 bg-[#151923]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 space-y-3 shadow-2xl max-h-[calc(100vh-85px)] overflow-y-auto">
     <div class="grid grid-cols-2 gap-2">
       <button onclick="switchTab('projects'); toggleMobileNav();" id="mob-tab-projects"
         class="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-accent-teal text-white flex items-center justify-between shadow-sm">
@@ -210,8 +258,23 @@
   </div>
 
   <!-- LOGIN SCREEN -->
-  <div id="loginView" class="flex-1 flex items-center justify-center p-4 md:p-6">
-    <div class="glass-card p-6 md:p-8 rounded-3xl max-w-md w-full space-y-6">
+  <div id="loginView" class="flex-1 min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
+
+    <!-- Branded Watermark Backdrop (Login Page Only) -->
+    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-0 overflow-hidden" aria-hidden="true">
+      <div class="text-center px-4 w-full max-w-6xl mx-auto">
+        <span class="block font-display font-black tracking-tight text-white/[0.05] leading-none"
+              style="font-size: clamp(3.5rem, 14vw, 11rem); letter-spacing: -0.04em;">
+          CaleByte
+        </span>
+        <span class="block font-sans font-bold uppercase tracking-[0.25em] sm:tracking-[0.4em] text-white/[0.05] mt-2 sm:mt-4 text-xs sm:text-sm md:text-base">
+          Portfolio Management Dashboard
+        </span>
+      </div>
+    </div>
+
+    <!-- Login Card (Centered) -->
+    <div class="glass-card p-6 sm:p-8 md:p-9 rounded-3xl max-w-md w-full space-y-6 relative z-10 shadow-2xl">
       <div class="text-center space-y-2">
         <div
           class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-teal to-accent-purple flex items-center justify-center text-white font-display font-black text-2xl mx-auto shadow-xl shadow-accent-teal/20">
@@ -283,37 +346,37 @@
     <!-- DESKTOP NAVIGATION TABS (NO EMOJIS) -->
     <div class="hidden md:flex flex-wrap gap-2 border-b border-white/10 pb-4">
       <button onclick="switchTab('projects')" id="tab-projects"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-accent-teal text-white shadow-md flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-gradient-to-r from-accent-teal to-accent-cyan text-white shadow-lg shadow-accent-teal/25 border border-accent-teal/30 flex items-center gap-2 cursor-pointer">
         <span>Projects</span>
-        <span id="tab-count-projects" class="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">0</span>
+        <span id="tab-count-projects" class="px-2 py-0.5 rounded-full bg-black/20 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('skills')" id="tab-skills"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>Skills</span>
         <span id="tab-count-skills" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('experiences')" id="tab-experiences"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>Experience</span>
         <span id="tab-count-experiences" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('strengths')" id="tab-strengths"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>Strengths</span>
         <span id="tab-count-strengths" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('source-codes')" id="tab-source-codes"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>Premium Store</span>
         <span id="tab-count-source-codes" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('free-source-codes')" id="tab-free-source-codes"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>Free Store</span>
         <span id="tab-count-free-source-codes" class="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">0</span>
       </button>
       <button onclick="switchTab('cv')" id="tab-cv"
-        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer">
+        class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer">
         <span>CV / Resume</span>
       </button>
     </div>
@@ -680,7 +743,7 @@
           class="w-full p-3 rounded-xl glass-input text-xs">
         <input id="skillLevel" type="number" min="1" max="100" placeholder="Proficiency % (1-100)" required
           class="w-full p-3 rounded-xl glass-input text-xs">
-        <select id="skillCategory" class="w-full p-3 rounded-xl glass-input text-xs bg-slate-900 text-white">
+        <select id="skillCategory" class="w-full p-3 rounded-xl glass-input text-xs bg-[#151923] text-white">
           <option value="Frontend">Frontend</option>
           <option value="Backend">Backend & Logic</option>
           <option value="Tools">Developer Tools</option>
@@ -898,7 +961,7 @@
           ? 'border-emerald-500/40 bg-emerald-950/80 text-emerald-200'
           : type === 'error'
             ? 'border-rose-500/40 bg-rose-950/80 text-rose-200'
-            : 'border-accent-teal/40 bg-slate-900/90 text-accent-teal'
+            : 'border-accent-teal/40 bg-[#151923]/95 text-accent-teal'
         }`;
 
       const iconSvg = type === 'success'
@@ -929,16 +992,18 @@
     }
 
     function showLogin() {
+      const navbar = document.getElementById('adminNavbar');
+      if (navbar) navbar.classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
       document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
       document.getElementById('mobileDrawer').classList.add('hidden');
     }
 
     function showDashboard() {
+      const navbar = document.getElementById('adminNavbar');
+      if (navbar) navbar.classList.remove('hidden');
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
-      document.getElementById('logoutBtn').classList.remove('hidden');
       loadAllData();
     }
 
@@ -1530,17 +1595,17 @@
         const hasValidImage = p.image && p.image.trim().startsWith('http');
         const imgMarkup = hasValidImage
           ? `<img src="${p.image}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-full h-36 object-cover rounded-xl border border-white/5">
-             <div style="display:none;" class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-slate-800 to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
+             <div style="display:none;" class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-[#151923] to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
                <span class="font-display font-bold text-white text-sm">${p.title || 'Project'}</span>
              </div>`
-          : `<div class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-slate-800 to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
+          : `<div class="w-full h-36 rounded-xl bg-gradient-to-br from-accent-teal/20 via-[#151923] to-accent-purple/20 border border-white/10 flex items-center justify-center text-center p-3">
                <span class="font-display font-bold text-white text-sm">${p.title || 'Project'}</span>
              </div>`;
 
         const techArray = Array.isArray(p.tech) ? p.tech : (typeof p.tech === 'string' ? p.tech.split(',') : []);
 
         return `
-          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border transition-all ${isFeat ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10 bg-gradient-to-b from-emerald-950/20 to-slate-900/90' : 'border-white/5'}">
+          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border transition-all ${isFeat ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10 bg-gradient-to-b from-emerald-950/20 to-[#151923]/90' : 'border-white/5'}">
             <div class="space-y-3">
               <div class="relative">
                 ${imgMarkup}
@@ -1729,23 +1794,23 @@
     // --- ACTIONS ---
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => {
-        b.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-2 cursor-pointer';
+        b.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.08] flex items-center gap-2 cursor-pointer';
       });
       const currentTab = document.getElementById(`tab-${tab}`);
-      if (currentTab) currentTab.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-accent-teal text-white shadow-md flex items-center gap-2 cursor-pointer';
+      if (currentTab) currentTab.className = 'tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-gradient-to-r from-accent-teal to-accent-cyan text-white shadow-lg shadow-accent-teal/25 border border-accent-teal/30 flex items-center gap-2 cursor-pointer';
 
       // Reset and set active styling on mobile drawer buttons
       const mobileDrawer = document.getElementById('mobileDrawer');
       if (mobileDrawer) {
         mobileDrawer.querySelectorAll('button').forEach(b => {
           if (b.id && b.id.startsWith('mob-tab-')) {
-            b.className = 'w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/5 text-gray-400 hover:text-white flex items-center justify-between';
+            b.className = 'w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/[0.04] text-slate-300 border border-white/10 hover:border-white/20 hover:text-white flex items-center justify-between';
           }
         });
       }
       const activeMobTab = document.getElementById(`mob-tab-${tab}`);
       if (activeMobTab) {
-        activeMobTab.className = 'w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-accent-teal text-white flex items-center justify-between shadow-sm';
+        activeMobTab.className = 'w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-gradient-to-r from-accent-teal to-accent-cyan text-white border border-accent-teal/30 flex items-center justify-between shadow-lg shadow-accent-teal/25';
       }
 
       document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
