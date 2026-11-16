@@ -283,6 +283,39 @@ router.delete('/free-source-codes/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Background Music Playlist CRUD
+router.get('/music', handleGet('music'));
+
+router.post('/music', authenticateToken, async (req, res) => {
+  try {
+    const item = await insertItem('music', req.body);
+    broadcastUpdate({ type: 'refresh' });
+    return res.status(201).json({ success: true, data: item });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error creating music track' });
+  }
+});
+
+router.put('/music/:id', authenticateToken, async (req, res) => {
+  try {
+    const updated = await updateItem('music', req.params.id, req.body);
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error updating music track' });
+  }
+});
+
+router.delete('/music/:id', authenticateToken, async (req, res) => {
+  try {
+    await deleteItem('music', req.params.id);
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error deleting music track' });
+  }
+});
+
 // Contacts Admin Inbox
 router.get('/contacts', authenticateToken, async (req, res) => {
   try {

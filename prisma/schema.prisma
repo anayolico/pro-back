@@ -65,3 +65,10 @@ model SourceCode {
   downloadLink String?
   createdAt    DateTime @default(now())
 }
+
+model Music {
+  id        Int      @id @default(autoincrement())
+  title     String
+  url       String
+  createdAt DateTime @default(now())
+}

@@ -199,6 +199,14 @@ const defaultFreeSourceCodes = [
   }
 ];
 
+const defaultMusic = [
+  {
+    id: "m1",
+    title: "Default Portfolio Track",
+    url: "/uploads/audio1.mp3"
+  }
+];
+
 let memoryDb = {
   projects: defaultProjects,
   skills: [],
@@ -207,6 +215,7 @@ let memoryDb = {
   contacts: [],
   source_codes: defaultSourceCodes,
   free_source_codes: defaultFreeSourceCodes,
+  music: defaultMusic,
   cv: defaultCvData
 };
 
@@ -301,6 +310,13 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS music (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        url TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE TABLE IF NOT EXISTS cv (
         id INT PRIMARY KEY DEFAULT 1,
         content JSONB NOT NULL
@@ -333,6 +349,13 @@ async function initDb() {
       INSERT INTO projects (title, "desc", desc_text, image, tech, demo_link, code_link, is_featured)
       SELECT 'Nigeria SecureVote', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', 'Next-generation cryptographic E-Voting & Identity Ingestion platform engineered for high-security multi-service elections. Combines NIMC NIN citizen lookup, PWA offline vote protection, WebAuthn biometric authorization, and real-time audit streaming.', '/media__1786134354519.png', '["React", "Node.js", "Python (FastAPI)", "Neon DB", "PWA Offline Sync"]'::jsonb, 'https://nigeria-secure-vote.vercel.app', 'https://github.com/anayolico/onetime', true
       WHERE NOT EXISTS (SELECT 1 FROM projects WHERE LOWER(title) LIKE '%securevote%');
+    `);
+
+    // Seed default portfolio audio track if music table is empty
+    await client.query(`
+      INSERT INTO music (title, url)
+      SELECT 'Default Portfolio Track', '/uploads/audio1.mp3'
+      WHERE NOT EXISTS (SELECT 1 FROM music);
     `);
 
     await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET content=$1`, [JSON.stringify(defaultCvData)]);
@@ -479,6 +502,12 @@ async function insertItem(table, data) {
         [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#']
       );
       return res.rows[0];
+    } else if (table === 'music') {
+      const res = await pool.query(
+        `INSERT INTO music (title, url) VALUES ($1, $2) RETURNING *`,
+        [data.title || 'Untitled Track', data.url || '']
+      );
+      return res.rows[0];
     }
   } catch (err) {
     console.error(`[DB Error] insertItem(${table}):`, err.message);
@@ -532,8 +561,8 @@ async function updateItem(table, id, data) {
       return row;
     } else if (table === 'skills') {
       const res = await pool.query(
-        `UPDATE skills SET name=$1, level=$2, category=$3 WHERE id=$4 RETURNING *`,
-        [data.name, data.level, data.category, id]
+        `UPDATE skills SET name=$1, level=COALESCE($2, level, 80), category=$3 WHERE id=$4 RETURNING *`,
+        [data.name, data.level !== undefined && data.level !== null && !isNaN(data.level) ? data.level : null, data.category, id]
       );
       return res.rows[0];
     } else if (table === 'experiences') {
@@ -559,6 +588,12 @@ async function updateItem(table, id, data) {
       const res = await pool.query(
         `UPDATE free_source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, download_link=$6 WHERE id=$7 RETURNING *`,
         [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#', id]
+      );
+      return res.rows[0];
+    } else if (table === 'music') {
+      const res = await pool.query(
+        `UPDATE music SET title=$1, url=$2 WHERE id=$3 RETURNING *`,
+        [data.title, data.url, id]
       );
       return res.rows[0];
     }

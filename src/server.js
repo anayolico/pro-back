@@ -69,8 +69,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static admin dashboard
+// Serve static admin dashboard and uploaded media/audio files
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Health check — available at both /health and /api/health
 const healthHandler = (req, res) => {
