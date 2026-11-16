@@ -2143,6 +2143,96 @@
       }
     }
 
+    function renderMusic() {
+      const grid = document.getElementById('musicGrid');
+      if (!grid) return;
+      const tracks = state.music || [];
+      if (tracks.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-500 col-span-full">No music tracks in database yet. Upload one to get started.</p>`;
+        return;
+      }
+      grid.innerHTML = tracks.map(m => `
+        <div class="glass-card p-5 rounded-2xl space-y-3 flex flex-col justify-between border border-white/10">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h4 class="font-bold text-white text-sm">${m.title || 'Untitled Track'}</h4>
+              <p class="text-[11px] text-gray-400 truncate max-w-[220px]">${m.url || ''}</p>
+            </div>
+            <button onclick="deleteMusic('${m.id}', this)" class="text-rose-400 hover:text-rose-300 font-bold text-[11px] px-2 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 cursor-pointer">Delete</button>
+          </div>
+          <audio controls src="${m.url}" class="w-full h-9 rounded-lg"></audio>
+        </div>
+      `).join('');
+    }
+
+    async function handleMusicFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('musicUploadStatus');
+      const saveBtn = document.getElementById('saveMusicBtn');
+      const titleInput = document.getElementById('musicTitle');
+      if (titleInput && !titleInput.value.trim()) {
+        titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+      }
+      if (statusEl) {
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = 'Uploading audio file...';
+      }
+      if (saveBtn) saveBtn.disabled = true;
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload?folder=portfolio_music', {
+          method: 'POST',
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        document.getElementById('musicUrl').value = data.url;
+        if (statusEl) statusEl.innerText = 'Audio uploaded successfully!';
+        showToast('Audio uploaded!', 'success');
+      } catch (err) {
+        if (statusEl) statusEl.innerText = 'Upload failed: ' + err.message;
+        showToast('Error uploading audio', 'error');
+      } finally {
+        if (saveBtn) saveBtn.disabled = false;
+      }
+    }
+
+    async function saveMusic(e) {
+      e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const payload = {
+        title: document.getElementById('musicTitle').value,
+        url: document.getElementById('musicUrl').value
+      };
+      setButtonLoading(submitBtn, true, 'Saving...');
+      try {
+        await fetchApi('/api/music', 'POST', payload);
+        showToast('Music track saved!', 'success');
+        closeModal('musicModal');
+        loadAllData();
+      } catch (err) {
+        showToast('Error saving music track', 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
+      }
+    }
+
+    async function deleteMusic(id, btn) {
+      if (btn) setButtonLoading(btn, true, 'Deleting...');
+      try {
+        await fetchApi(`/api/music/${id}`, 'DELETE');
+        showToast('Music track removed!', 'success');
+        loadAllData();
+      } catch (err) {
+        showToast('Error deleting music track', 'error');
+        if (btn) setButtonLoading(btn, false);
+      }
+    }
+
     function editExperience(id) {
       const e = state.experiences.find(x => String(x.id) === String(id));
       if (!e) return;
