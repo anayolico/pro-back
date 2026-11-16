@@ -1788,12 +1788,31 @@
         const formattedPrice = isFree ? 'FREE' : `₦${(sc.price || 15000).toLocaleString()}`;
         const editFn = isFree ? 'editFreeSourceCode' : 'editSourceCode';
         const deleteFn = isFree ? 'deleteFreeSourceCode' : 'deleteSourceCode';
+        const isFeat = Boolean(sc.is_featured || sc.isFeatured);
         return `
-          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border border-white/10">
+          <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border ${isFeat ? 'border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.12)]' : 'border-white/10'}">
             <div class="space-y-3">
               <div class="flex items-center justify-between gap-2">
                 <span class="text-xs font-extrabold ${isFree ? 'text-emerald-400' : 'text-white'} font-display">${formattedPrice}</span>
+                ${isFeat ? `
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-950/90 border border-emerald-400/40 text-[10px] font-extrabold text-emerald-300 uppercase tracking-wider font-mono">Homepage Active</span>
+                ` : ''}
               </div>
+
+              <!-- Feature on Homepage Toggle Switch (Max 2 per store) -->
+              <div class="flex items-center justify-between p-2.5 rounded-xl ${isFeat ? 'bg-emerald-500/15 border border-emerald-500/40' : 'bg-white/[0.03] border border-white/10'} transition-all">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full ${isFeat ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-gray-500'}"></span>
+                  <span class="text-[11px] font-bold ${isFeat ? 'text-emerald-300 font-mono' : 'text-gray-400'}">
+                    ${isFeat ? 'Active on Homepage' : 'Hidden from Homepage'}
+                  </span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" ${isFeat ? 'checked' : ''} onchange="toggleSourceCodeFeature('${sc.id}', ${isFree}, this.checked, this)" class="sr-only peer">
+                  <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
               <h3 class="font-bold text-white font-display text-base leading-tight">${sc.title}</h3>
               <p class="text-xs text-gray-400 line-clamp-2">${sc.description || ''}</p>
               <div class="flex flex-wrap gap-1">
@@ -1996,6 +2015,34 @@
         progressEl.classList.add('hidden');
       } finally {
         if (btn) setButtonLoading(btn, false);
+      }
+    }
+
+    async function toggleSourceCodeFeature(id, isFree, isChecked, checkboxEl) {
+      const list = isFree ? (state.freeSourceCodes || []) : (state.sourceCodes || []);
+      const label = isFree ? 'free source codes' : 'premium source codes';
+      if (isChecked) {
+        const currentlyFeatured = list.filter(item => Boolean(item.is_featured || item.isFeatured) && String(item.id) !== String(id));
+        if (currentlyFeatured.length >= 2) {
+          if (checkboxEl) checkboxEl.checked = false;
+          showToast(`Limit reached: You can only have 2 ${label} active on the homepage at once. Turn off an existing one first.`, 'error');
+          return;
+        }
+      }
+
+      const endpoint = isFree ? `/api/free-source-codes/${id}/feature` : `/api/source-codes/${id}/feature`;
+      try {
+        await fetchApi(endpoint, 'PATCH', { is_featured: isChecked });
+        const target = list.find(item => String(item.id) === String(id));
+        if (target) {
+          target.is_featured = isChecked;
+          target.isFeatured = isChecked;
+        }
+        showToast(isChecked ? 'Item is now active on the homepage!' : 'Item removed from homepage.', 'success');
+        renderSourceCodes();
+      } catch (err) {
+        if (checkboxEl) checkboxEl.checked = !isChecked;
+        showToast(err.message || 'Error updating homepage status', 'error');
       }
     }
 

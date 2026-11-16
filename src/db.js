@@ -326,6 +326,8 @@ async function initDb() {
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS desc_text TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+      ALTER TABLE source_codes ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+      ALTER TABLE free_source_codes ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE strengths ADD COLUMN IF NOT EXISTS desc_text TEXT;
     `);
@@ -428,7 +430,7 @@ async function getTableData(table) {
       if (row.download_link) {
         row.downloadLink = row.download_link;
       }
-      if (table === 'projects') {
+      if (table === 'projects' || table === 'source_codes' || table === 'free_source_codes') {
         row.is_featured = Boolean(row.is_featured);
         row.isFeatured = Boolean(row.is_featured);
       }
@@ -491,17 +493,23 @@ async function insertItem(table, data) {
       );
       return res.rows[0];
     } else if (table === 'source_codes') {
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : false);
       const res = await pool.query(
-        `INSERT INTO source_codes (title, filename, filesize, description, tech, price, download_link) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.price || 15000, data.downloadLink || data.download_link || '#']
+        `INSERT INTO source_codes (title, filename, filesize, description, tech, price, download_link, is_featured) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.price || 15000, data.downloadLink || data.download_link || '#', isFeatured]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) { row.is_featured = Boolean(row.is_featured); row.isFeatured = Boolean(row.is_featured); }
+      return row;
     } else if (table === 'free_source_codes') {
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : false);
       const res = await pool.query(
-        `INSERT INTO free_source_codes (title, filename, filesize, description, tech, download_link) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#']
+        `INSERT INTO free_source_codes (title, filename, filesize, description, tech, download_link, is_featured) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [data.title || '', data.filename || '', data.filesize || '', data.description || '', JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#', isFeatured]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) { row.is_featured = Boolean(row.is_featured); row.isFeatured = Boolean(row.is_featured); }
+      return row;
     } else if (table === 'music') {
       const res = await pool.query(
         `INSERT INTO music (title, url) VALUES ($1, $2) RETURNING *`,
@@ -579,17 +587,40 @@ async function updateItem(table, id, data) {
       );
       return res.rows[0];
     } else if (table === 'source_codes') {
+      const currentRes = await pool.query('SELECT * FROM source_codes WHERE id=$1', [id]);
+      const current = currentRes.rows[0];
+      const title = data.title !== undefined ? data.title : (current ? current.title : '');
+      const filename = data.filename !== undefined ? data.filename : (current ? current.filename : '');
+      const filesize = data.filesize !== undefined ? data.filesize : (current ? current.filesize : '');
+      const description = data.description !== undefined ? data.description : (current ? current.description : '');
+      const tech = data.tech !== undefined ? (typeof data.tech === 'string' ? data.tech : JSON.stringify(data.tech)) : (current ? (typeof current.tech === 'string' ? current.tech : JSON.stringify(current.tech || [])) : '[]');
+      const price = data.price !== undefined ? data.price : (current ? current.price : 15000);
+      const downloadLink = data.downloadLink !== undefined ? data.downloadLink : (data.download_link !== undefined ? data.download_link : (current ? (current.download_link || '#') : '#'));
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : (current ? Boolean(current.is_featured) : false));
       const res = await pool.query(
-        `UPDATE source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, price=$6, download_link=$7 WHERE id=$8 RETURNING *`,
-        [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.price, data.downloadLink || data.download_link || '#', id]
+        `UPDATE source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, price=$6, download_link=$7, is_featured=$8 WHERE id=$9 RETURNING *`,
+        [title, filename, filesize, description, tech, price, downloadLink, isFeatured, id]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) { row.is_featured = Boolean(row.is_featured); row.isFeatured = Boolean(row.is_featured); }
+      return row;
     } else if (table === 'free_source_codes') {
+      const currentRes = await pool.query('SELECT * FROM free_source_codes WHERE id=$1', [id]);
+      const current = currentRes.rows[0];
+      const title = data.title !== undefined ? data.title : (current ? current.title : '');
+      const filename = data.filename !== undefined ? data.filename : (current ? current.filename : '');
+      const filesize = data.filesize !== undefined ? data.filesize : (current ? current.filesize : '');
+      const description = data.description !== undefined ? data.description : (current ? current.description : '');
+      const tech = data.tech !== undefined ? (typeof data.tech === 'string' ? data.tech : JSON.stringify(data.tech)) : (current ? (typeof current.tech === 'string' ? current.tech : JSON.stringify(current.tech || [])) : '[]');
+      const downloadLink = data.downloadLink !== undefined ? data.downloadLink : (data.download_link !== undefined ? data.download_link : (current ? (current.download_link || '#') : '#'));
+      const isFeatured = data.is_featured !== undefined ? Boolean(data.is_featured) : (data.isFeatured !== undefined ? Boolean(data.isFeatured) : (current ? Boolean(current.is_featured) : false));
       const res = await pool.query(
-        `UPDATE free_source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, download_link=$6 WHERE id=$7 RETURNING *`,
-        [data.title, data.filename, data.filesize, data.description, JSON.stringify(data.tech || []), data.downloadLink || data.download_link || '#', id]
+        `UPDATE free_source_codes SET title=$1, filename=$2, filesize=$3, description=$4, tech=$5, download_link=$6, is_featured=$7 WHERE id=$8 RETURNING *`,
+        [title, filename, filesize, description, tech, downloadLink, isFeatured, id]
       );
-      return res.rows[0];
+      const row = res.rows[0];
+      if (row) { row.is_featured = Boolean(row.is_featured); row.isFeatured = Boolean(row.is_featured); }
+      return row;
     } else if (table === 'music') {
       const res = await pool.query(
         `UPDATE music SET title=$1, url=$2 WHERE id=$3 RETURNING *`,

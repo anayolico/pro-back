@@ -217,11 +217,28 @@ router.delete('/strengths/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Helper to enforce max active homepage items for source_codes / free_source_codes
+async function checkSourceCodeFeatureLimit(table, excludeId, label) {
+  const allItems = await getTableData(table);
+  const activeFeatured = allItems.filter(
+    item => Boolean(item.is_featured || item.isFeatured) && (!excludeId || String(item.id) !== String(excludeId))
+  );
+  if (activeFeatured.length >= 2) {
+    return `Limit reached: A maximum of 2 ${label} can be active on the homepage at once. Please turn off another one first.`;
+  }
+  return null;
+}
+
 router.get('/source-codes', handleGet('source_codes'));
 
 // Source Codes CRUD
 router.post('/source-codes', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : false);
+    if (isFeat) {
+      const limitErr = await checkSourceCodeFeatureLimit('source_codes', null, 'premium source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
     const item = await insertItem('source_codes', req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
@@ -232,11 +249,32 @@ router.post('/source-codes', authenticateToken, async (req, res) => {
 
 router.put('/source-codes/:id', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : undefined);
+    if (isFeat === true) {
+      const limitErr = await checkSourceCodeFeatureLimit('source_codes', req.params.id, 'premium source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
     const updated = await updateItem('source_codes', req.params.id, req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating source code item' });
+  }
+});
+
+router.patch('/source-codes/:id/feature', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const targetState = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : Boolean(req.body.isFeatured);
+    if (targetState) {
+      const limitErr = await checkSourceCodeFeatureLimit('source_codes', id, 'premium source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
+    const updated = await updateItem('source_codes', id, { is_featured: targetState, isFeatured: targetState });
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true, data: updated, is_featured: targetState, isFeatured: targetState });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error updating source code featured status' });
   }
 });
 
@@ -255,6 +293,11 @@ router.get('/free-source-codes', handleGet('free_source_codes'));
 
 router.post('/free-source-codes', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : false);
+    if (isFeat) {
+      const limitErr = await checkSourceCodeFeatureLimit('free_source_codes', null, 'free source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
     const item = await insertItem('free_source_codes', req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.status(201).json({ success: true, data: item });
@@ -265,11 +308,32 @@ router.post('/free-source-codes', authenticateToken, async (req, res) => {
 
 router.put('/free-source-codes/:id', authenticateToken, async (req, res) => {
   try {
+    const isFeat = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : (req.body.isFeatured !== undefined ? Boolean(req.body.isFeatured) : undefined);
+    if (isFeat === true) {
+      const limitErr = await checkSourceCodeFeatureLimit('free_source_codes', req.params.id, 'free source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
     const updated = await updateItem('free_source_codes', req.params.id, req.body);
     broadcastUpdate({ type: 'refresh' });
     return res.json({ success: true, data: updated });
   } catch (err) {
     return res.status(500).json({ error: 'Error updating free source code item' });
+  }
+});
+
+router.patch('/free-source-codes/:id/feature', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const targetState = req.body.is_featured !== undefined ? Boolean(req.body.is_featured) : Boolean(req.body.isFeatured);
+    if (targetState) {
+      const limitErr = await checkSourceCodeFeatureLimit('free_source_codes', id, 'free source codes');
+      if (limitErr) return res.status(400).json({ error: limitErr });
+    }
+    const updated = await updateItem('free_source_codes', id, { is_featured: targetState, isFeatured: targetState });
+    broadcastUpdate({ type: 'refresh' });
+    return res.json({ success: true, data: updated, is_featured: targetState, isFeatured: targetState });
+  } catch (err) {
+    return res.status(500).json({ error: 'Error updating free source code featured status' });
   }
 });
 

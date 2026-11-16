@@ -63,6 +63,7 @@ model SourceCode {
   tech         Json?
   price        Int      @default(15000)
   downloadLink String?
+  isFeatured   Boolean  @default(false)
   createdAt    DateTime @default(now())
 }
 
