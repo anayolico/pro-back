@@ -4,8 +4,10 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { initializeTransaction, verifyTransaction, verifyWebhookSignature } = require('../services/paystack');
 const { getTableData } = require('../db');
+const { sendEmailWithFallback } = require('../services/email');
 
 const router = express.Router();
+const processedWebhookRefs = new Set();
 
 const DOWNLOAD_SECRET = process.env.DOWNLOAD_SECRET || process.env.JWT_SECRET || 'calebyte_jwt_secure_download_2026';
 const STORAGE_DIR = path.join(__dirname, '../../storage/codebases');
@@ -63,13 +65,14 @@ async function resolveProjectDetails(projectId) {
  */
 router.post('/initialize', async (req, res) => {
   try {
-    const { email, amount, type, projectId, name } = req.body;
+    const { email, amount, type, projectId, name, returnUrl } = req.body;
 
     if (!email || !email.includes('@')) {
       return res.status(400).json({ success: false, error: 'A valid email address is required.' });
     }
 
-    const frontendUrl = getFrontendUrl();
+    const originHeader = (typeof returnUrl === 'string' && returnUrl.startsWith('http')) ? returnUrl : req.headers.origin;
+    const frontendUrl = (originHeader && originHeader.startsWith('http')) ? originHeader.replace(/\/$/, '') : getFrontendUrl();
     const isSourceCode = type === 'source_code';
 
     let finalAmountInKobo = 0;
@@ -222,8 +225,77 @@ router.post('/webhook', async (req, res) => {
     const data = eventData.data || {};
     const reference = data.reference;
     const amount = (data.amount || 0) / 100;
+    const metadata = data.metadata || {};
 
     console.log(`[Paystack Webhook] Verified payment of ₦${amount} (Ref: ${reference})`);
+
+    if (!reference || processedWebhookRefs.has(reference)) {
+      return;
+    }
+    processedWebhookRefs.add(reference);
+    if (processedWebhookRefs.size > 500) {
+      const first = processedWebhookRefs.values().next().value;
+      processedWebhookRefs.delete(first);
+    }
+
+    if (metadata.type === 'source_code') {
+      try {
+        const project = metadata.projectId ? await resolveProjectDetails(metadata.projectId) : null;
+        const projectTitle = project?.title || metadata.projectTitle || 'Source Code Package';
+        const downloadUrl = project?.download_link || metadata.download_link || metadata.downloadLink || '';
+        const buyerEmail = (data.customer && data.customer.email) || metadata.buyerEmail || '';
+
+        if (!buyerEmail || !downloadUrl) {
+          console.warn(`[Paystack Webhook] Missing buyerEmail or downloadUrl for Ref ${reference}`);
+          return;
+        }
+
+        if (!process.env.RESEND_API_KEY) {
+          console.warn('[Paystack Webhook] RESEND_API_KEY is not configured; cannot send download email.');
+          return;
+        }
+
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; padding: 24px; color: #e2e8f0; background-color: #0b0e14; max-width: 600px; margin: 0 auto; border: 1px solid #1e293b; border-radius: 16px;">
+            <h2 style="color: #fbbf24; margin-top: 0;">Thank You for Your Purchase!</h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1;">
+              Your payment for <strong>${projectTitle}</strong> has been confirmed by Paystack.
+            </p>
+            <div style="background-color: #151924; padding: 16px; border-radius: 12px; border: 1px solid #334155; margin: 20px 0;">
+              <p style="margin: 4px 0; font-size: 13px;"><strong>Package:</strong> ${projectTitle}</p>
+              <p style="margin: 4px 0; font-size: 13px;"><strong>Amount Paid:</strong> ₦${Number(amount).toLocaleString()}</p>
+              <p style="margin: 4px 0; font-size: 13px;"><strong>Reference:</strong> <code>${reference}</code></p>
+            </div>
+            <div style="text-align: center; margin: 28px 0;">
+              <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer"
+                style="display: inline-block; padding: 14px 28px; background-color: #f59e0b; color: #0f172a; font-weight: bold; text-decoration: none; border-radius: 10px; font-size: 15px;">
+                Download Source Code
+              </a>
+            </div>
+            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+              If the button above does not work, copy and paste this link into your browser:<br />
+              <a href="${downloadUrl}" style="color: #2dd4bf; word-break: break-all;">${downloadUrl}</a>
+            </p>
+            <hr style="border: none; border-top: 1px solid #1e293b; margin: 24px 0;" />
+            <p style="font-size: 11px; color: #64748b; margin: 0;">CaleByte Technologies • Automated Source Code Delivery</p>
+          </div>
+        `;
+
+        const result = await sendEmailWithFallback({
+          to: buyerEmail,
+          subject: `Your Source Code Download: ${projectTitle}`,
+          html: emailHtml
+        });
+
+        if (result.error) {
+          console.error(`[Paystack Webhook] Failed to send email to ${buyerEmail}:`, result.error);
+        } else {
+          console.log(`[Paystack Webhook] Sent source code download email to ${buyerEmail} (Ref: ${reference})`);
+        }
+      } catch (emailErr) {
+        console.error('[Paystack Webhook Email Error]', emailErr.message);
+      }
+    }
   }
 });
 
