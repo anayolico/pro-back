@@ -2398,12 +2398,9 @@
       }
       grid.innerHTML = tracks.map(m => `
         <div class="glass-card p-5 rounded-2xl space-y-3 flex flex-col justify-between border border-white/10">
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <h4 class="font-bold text-white text-sm">${m.title || 'Untitled Track'}</h4>
-              <p class="text-[11px] text-gray-400 truncate max-w-[220px]">${m.url || ''}</p>
-            </div>
-            <button onclick="deleteMusic('${m.id}', this)" class="text-rose-400 hover:text-rose-300 font-bold text-[11px] px-2 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 cursor-pointer">Delete</button>
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="font-bold text-white text-sm truncate">${m.title || 'Untitled Track'}</h4>
+            <button onclick="deleteMusic('${m.id}', this)" class="text-rose-400 hover:text-rose-300 font-bold text-[11px] px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 flex-shrink-0 cursor-pointer">Delete</button>
           </div>
           <audio controls src="${m.url}" class="w-full h-9 rounded-lg"></audio>
         </div>
