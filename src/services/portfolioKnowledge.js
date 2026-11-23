@@ -188,16 +188,67 @@ The portfolio features an ambient music player in the bottom-right corner with t
   return snapshot;
 }
 
-async function getPortfolioSystemInstruction(mode = 'chat') {
+const LIVE_LANGUAGES = {
+  english: {
+    label: 'English',
+    directive:
+      'Speak ONLY in clear, natural, warm English. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
+  },
+  pidgin: {
+    label: 'Nigerian Pidgin',
+    directive:
+      'Speak ONLY in natural, warm, friendly, and respectful Nigerian Pidgin English (the way everyday Nigerian tech professionals speak Pidgin — e.g. "How far!", "No wahala", "Caleb sabi build..."). Keep technical terms like React, Node.js, FastAPI, Paystack, and project names clear. NEVER switch out of Nigerian Pidgin into Spanish or another language due to background noise.'
+  },
+  igbo: {
+    label: 'Igbo',
+    directive:
+      'Speak ONLY in clear, natural, polite Igbo (with common technical terms and project names pronounced clearly). NEVER switch into Spanish or another unrelated language due to background noise.'
+  },
+  yoruba: {
+    label: 'Yoruba',
+    directive:
+      'Speak ONLY in clear, natural, respectful Yoruba (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
+  },
+  hausa: {
+    label: 'Hausa',
+    directive:
+      'Speak ONLY in clear, natural, polite Hausa (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
+  },
+  french: {
+    label: 'French',
+    directive:
+      'Speak ONLY in clear, natural, friendly French. NEVER switch into another language due to background noise.'
+  },
+  spanish: {
+    label: 'Spanish',
+    directive:
+      'Speak ONLY in clear, natural, friendly Spanish. NEVER switch into another language due to background noise.'
+  }
+};
+
+function normalizeLiveLanguage(lang) {
+  const key = typeof lang === 'string' ? lang.trim().toLowerCase() : 'english';
+  return LIVE_LANGUAGES[key] ? key : 'english';
+}
+
+async function getPortfolioSystemInstruction(mode = 'chat', language = 'english') {
   const knowledge = await buildPortfolioSnapshot();
 
   if (mode === 'voice') {
+    const langKey = normalizeLiveLanguage(language);
+    const langCfg = LIVE_LANGUAGES[langKey];
+
     return `You are CaleByte AI, the official real-time voice assistant on Caleb Anayolico's (CaleByte) developer portfolio website.
+
+STRICT LANGUAGE RULE (HIGHEST PRIORITY):
+- Selected Call Language: ${langCfg.label}
+- ${langCfg.directive}
+- If you hear faint room noise, static, coughing, or unintelligible syllables, IGNORE them silently or briefly ask the visitor to repeat in ${langCfg.label}. NEVER guess or switch to another language.
 
 VOICE STYLE RULES:
 - Speak naturally, warmly, confidently, and concisely — like a helpful human teammate on a live call.
 - Keep spoken answers short and conversational (typically 2 to 4 sentences) unless the visitor specifically asks for a deeper technical breakdown.
-- Do NOT read raw URLs, markdown symbols, asterisks, or bullet syntax aloud. Refer to pages naturally (e.g., "the Projects page", "the Source Code Store", "the CV page", or "the Support button").
+- Do NOT read raw URLs, markdown symbols, asterisks, or bullet syntax aloud. Refer to pages naturally (e.g., the Projects page, the Source Code Store, the CV page, or the Support button).
 - Answer accurately using ONLY the live portfolio knowledge below. If something is not listed, be honest and invite the visitor to contact Caleb directly via the Contact form, email, or WhatsApp.
 - If a visitor asks how to support Caleb, explain the Paystack Support option (presets from 2,000 to 20,000 Naira or any custom amount from 100 Naira), buying premium source code packages, or hiring/collaborating with him.
 - Start warmly if greeted and always stay helpful, respectful, and focused on Caleb / CaleByte's portfolio, services, projects, skills, store, and contact options.
@@ -223,5 +274,7 @@ ${knowledge}`;
 module.exports = {
   buildPortfolioSnapshot,
   getPortfolioSystemInstruction,
-  invalidateKnowledgeCache
+  invalidateKnowledgeCache,
+  normalizeLiveLanguage,
+  LIVE_LANGUAGES
 };

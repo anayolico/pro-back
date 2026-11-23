@@ -1,6 +1,6 @@
 const express = require('express');
 const { GoogleGenAI } = require('@google/genai');
-const { getPortfolioSystemInstruction } = require('../services/portfolioKnowledge');
+const { getPortfolioSystemInstruction, normalizeLiveLanguage } = require('../services/portfolioKnowledge');
 const { getSetting, setSetting } = require('../db');
 const { authenticateToken } = require('./auth');
 const { broadcastUpdate } = require('../sse');
@@ -20,7 +20,7 @@ const CHAT_MODEL_CHAIN = Array.from(
 );
 const DEFAULT_LIVE_MODEL = process.env.GEMINI_LIVE_MODEL || 'gemini-3.8-live';
 const DEFAULT_LIVE_VOICE = process.env.GEMINI_LIVE_VOICE || 'Aoede';
-const MAX_CALL_SECONDS = Math.max(60, Math.min(600, parseInt(process.env.GEMINI_MAX_CALL_SECONDS || '240', 10) || 240));
+const MAX_CALL_SECONDS = Math.max(60, Math.min(600, parseInt(process.env.GEMINI_MAX_CALL_SECONDS || '180', 10) || 180));
 
 // Simple in-memory sliding-window rate limiter per IP
 const rateBuckets = new Map();
@@ -271,7 +271,8 @@ router.post('/live-token', async (req, res) => {
   }
 
   try {
-    const voiceInstruction = await getPortfolioSystemInstruction('voice');
+    const selectedLanguage = normalizeLiveLanguage(req.body?.language);
+    const voiceInstruction = await getPortfolioSystemInstruction('voice', selectedLanguage);
     const expireTime = new Date(Date.now() + (MAX_CALL_SECONDS + 120) * 1000).toISOString();
     const newSessionExpireTime = new Date(Date.now() + 90 * 1000).toISOString();
 
@@ -298,9 +299,7 @@ router.post('/live-token', async (req, res) => {
                   voiceName: DEFAULT_LIVE_VOICE
                 }
               }
-            },
-            inputAudioTranscription: {},
-            outputAudioTranscription: {}
+            }
           }
         }
       }
@@ -314,6 +313,7 @@ router.post('/live-token', async (req, res) => {
       token: tokenResp.name,
       model: DEFAULT_LIVE_MODEL,
       voice: DEFAULT_LIVE_VOICE,
+      language: selectedLanguage,
       maxCallSeconds: MAX_CALL_SECONDS,
       expiresAt: expireTime
     });
