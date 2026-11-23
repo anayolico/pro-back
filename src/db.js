@@ -216,7 +216,10 @@ let memoryDb = {
   source_codes: defaultSourceCodes,
   free_source_codes: defaultFreeSourceCodes,
   music: defaultMusic,
-  cv: defaultCvData
+  cv: defaultCvData,
+  site_settings: /** @type {Record<string, any>} */ ({
+    ai_assistant_enabled: true
+  })
 };
 
 async function initDb() {
@@ -322,6 +325,12 @@ async function initDb() {
         content JSONB NOT NULL
       );
 
+      CREATE TABLE IF NOT EXISTS site_settings (
+        key TEXT PRIMARY KEY,
+        value JSONB NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS image TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS "desc" TEXT;
       ALTER TABLE projects ADD COLUMN IF NOT EXISTS desc_text TEXT;
@@ -358,6 +367,13 @@ async function initDb() {
       INSERT INTO music (title, url)
       SELECT 'Default Portfolio Track', '/uploads/audio1.mp3'
       WHERE NOT EXISTS (SELECT 1 FROM music);
+    `);
+
+    // Seed default AI assistant visibility setting (ON by default; never overwrites saved admin preference)
+    await client.query(`
+      INSERT INTO site_settings (key, value)
+      VALUES ('ai_assistant_enabled', 'true'::jsonb)
+      ON CONFLICT (key) DO NOTHING;
     `);
 
     await client.query(`INSERT INTO cv (id, content) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET content=$1`, [JSON.stringify(defaultCvData)]);
@@ -739,6 +755,48 @@ async function updateCvData(data) {
   }
 }
 
+async function getSetting(key, defaultValue = true) {
+  if (useMemoryFallback || !pool) {
+    if (memoryDb.site_settings && key in memoryDb.site_settings) {
+      return memoryDb.site_settings[key];
+    }
+    return defaultValue;
+  }
+  try {
+    const res = await pool.query('SELECT value FROM site_settings WHERE key=$1', [key]);
+    if (res.rows.length > 0 && res.rows[0].value !== undefined) {
+      return res.rows[0].value;
+    }
+    return defaultValue;
+  } catch (err) {
+    console.error(`[DB Error] getSetting(${key}):`, err.message);
+    if (memoryDb.site_settings && key in memoryDb.site_settings) {
+      return memoryDb.site_settings[key];
+    }
+    return defaultValue;
+  }
+}
+
+async function setSetting(key, value) {
+  if (!memoryDb.site_settings) memoryDb.site_settings = { ai_assistant_enabled: true };
+  memoryDb.site_settings[key] = value;
+  if (useMemoryFallback || !pool) {
+    return value;
+  }
+  try {
+    await pool.query(
+      `INSERT INTO site_settings (key, value, updated_at)
+       VALUES ($1, $2::jsonb, CURRENT_TIMESTAMP)
+       ON CONFLICT (key) DO UPDATE SET value=$2::jsonb, updated_at=CURRENT_TIMESTAMP`,
+      [key, JSON.stringify(value)]
+    );
+    return value;
+  } catch (err) {
+    console.error(`[DB Error] setSetting(${key}):`, err.message);
+    return value;
+  }
+}
+
 module.exports = {
   initDb,
   getTableData,
@@ -747,5 +805,7 @@ module.exports = {
   deleteItem,
   getCvData,
   updateCvData,
+  getSetting,
+  setSetting,
   defaultCvData
 };

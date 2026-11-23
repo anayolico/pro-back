@@ -1,6 +1,9 @@
 const express = require('express');
 const { GoogleGenAI } = require('@google/genai');
 const { getPortfolioSystemInstruction } = require('../services/portfolioKnowledge');
+const { getSetting, setSetting } = require('../db');
+const { authenticateToken } = require('./auth');
+const { broadcastUpdate } = require('../sse');
 
 const router = express.Router();
 
@@ -36,10 +39,12 @@ function getApiKey() {
   return (process.env.GEMINI_API_KEY || '').trim();
 }
 
-// GET /api/ai/status — Lets frontend know if AI is configured & call limits
-router.get('/status', (req, res) => {
+// GET /api/ai/status — Lets frontend & admin know if AI is enabled, configured & call limits
+router.get('/status', async (req, res) => {
   const configured = Boolean(getApiKey());
+  const enabled = Boolean(await getSetting('ai_assistant_enabled', true));
   res.json({
+    enabled,
     configured,
     chatModel: DEFAULT_CHAT_MODEL,
     liveModel: DEFAULT_LIVE_MODEL,
@@ -48,8 +53,31 @@ router.get('/status', (req, res) => {
   });
 });
 
+// PATCH /api/ai/settings — Admin-only toggle to show/hide AI Call & Chat on the portfolio
+router.patch('/settings', authenticateToken, async (req, res) => {
+  try {
+    const { enabled } = req.body || {};
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ error: 'enabled must be a boolean (true or false).' });
+    }
+    await setSetting('ai_assistant_enabled', enabled);
+    broadcastUpdate({ type: 'refresh', aiEnabled: enabled });
+    return res.json({ success: true, enabled });
+  } catch (err) {
+    console.error('[AI Settings Error]', err?.message || err);
+    return res.status(500).json({ error: 'Failed to update AI visibility setting.' });
+  }
+});
+
 // POST /api/ai/chat — Text-only streaming chat backed by live portfolio DB knowledge
 router.post('/chat', async (req, res) => {
+  const enabled = Boolean(await getSetting('ai_assistant_enabled', true));
+  if (!enabled) {
+    return res.status(403).json({
+      error: 'CaleByte AI is currently turned off by the site administrator.'
+    });
+  }
+
   const apiKey = getApiKey();
   if (!apiKey) {
     return res.status(503).json({
@@ -176,6 +204,13 @@ router.post('/chat', async (req, res) => {
 
 // POST /api/ai/live-token — Mints a short-lived, single-use Gemini Live ephemeral token
 router.post('/live-token', async (req, res) => {
+  const enabled = Boolean(await getSetting('ai_assistant_enabled', true));
+  if (!enabled) {
+    return res.status(403).json({
+      error: 'CaleByte AI Live Call is currently turned off by the site administrator.'
+    });
+  }
+
   const apiKey = getApiKey();
   if (!apiKey) {
     return res.status(503).json({

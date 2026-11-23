@@ -344,6 +344,16 @@
           <span class="text-amber-400 text-xs font-bold uppercase tracking-widest">Core</span>
         </div>
       </div>
+      <div id="aiStatusCard" class="glass-card p-4 rounded-2xl space-y-2 col-span-2 md:col-span-1 border border-emerald-500/30 transition-all">
+        <span class="text-[10px] uppercase font-extrabold text-gray-400 tracking-wider block">AI Call &amp; Chat</span>
+        <div class="flex items-center justify-between pt-0.5">
+          <span id="aiToggleLabel" class="text-sm font-extrabold font-display text-emerald-300">Visible</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="aiAssistantToggle" checked onchange="toggleAiAssistant(this.checked, this)" class="sr-only peer">
+            <div class="w-10 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
+        </div>
+      </div>
 
     </div>
 
@@ -1249,7 +1259,7 @@
 
     async function loadAllData() {
       try {
-        const [pRes, sRes, eRes, stRes, scRes, fscRes, mRes, cRes] = await Promise.all([
+        const [pRes, sRes, eRes, stRes, scRes, fscRes, mRes, cRes, aiRes] = await Promise.all([
           fetchApi('/api/projects'),
           fetchApi('/api/skills'),
           fetchApi('/api/experiences'),
@@ -1258,6 +1268,7 @@
           fetchApi('/api/free-source-codes'),
           fetchApi('/api/music'),
           fetchApi('/api/contacts'),
+          fetchApi('/api/ai/status').catch(() => ({ enabled: true })),
           loadCvData()
         ]);
 
@@ -1283,10 +1294,49 @@
         state.contacts = cRes.data || [];
         renderContacts();
 
+        updateAiToggleUI(aiRes?.enabled !== false);
+
         updateStatCounters();
       } catch (e) {
         console.error('Data load error:', e);
         showToast('Error loading dashboard data', 'error');
+      }
+    }
+
+    function updateAiToggleUI(isEnabled) {
+      const checkbox = document.getElementById('aiAssistantToggle');
+      const label = document.getElementById('aiToggleLabel');
+      const card = document.getElementById('aiStatusCard');
+      if (checkbox) checkbox.checked = Boolean(isEnabled);
+      if (label) {
+        label.textContent = isEnabled ? 'Visible' : 'Hidden';
+        label.className = isEnabled
+          ? 'text-sm font-extrabold font-display text-emerald-300'
+          : 'text-sm font-extrabold font-display text-gray-400';
+      }
+      if (card) {
+        card.className = isEnabled
+          ? 'glass-card p-4 rounded-2xl space-y-2 col-span-2 md:col-span-1 border border-emerald-500/30 transition-all'
+          : 'glass-card p-4 rounded-2xl space-y-2 col-span-2 md:col-span-1 border border-white/10 transition-all';
+      }
+    }
+
+    async function toggleAiAssistant(isChecked, checkboxEl) {
+      if (checkboxEl) checkboxEl.disabled = true;
+      try {
+        await fetchApi('/api/ai/settings', 'PATCH', { enabled: Boolean(isChecked) });
+        updateAiToggleUI(Boolean(isChecked));
+        showToast(
+          isChecked
+            ? 'AI Call & Chat is now visible on your portfolio!'
+            : 'AI Call & Chat is now hidden from your portfolio.',
+          'success'
+        );
+      } catch (err) {
+        updateAiToggleUI(!isChecked);
+        showToast(err.message || 'Error updating AI visibility setting', 'error');
+      } finally {
+        if (checkboxEl) checkboxEl.disabled = false;
       }
     }
 
