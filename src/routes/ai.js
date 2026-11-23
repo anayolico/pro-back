@@ -7,7 +7,17 @@ const { broadcastUpdate } = require('../sse');
 
 const router = express.Router();
 
-const DEFAULT_CHAT_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-4-hydrogen';
+const DEFAULT_CHAT_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
+const CHAT_MODEL_CHAIN = Array.from(
+  new Set(
+    [
+      DEFAULT_CHAT_MODEL,
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-4-hydrogen'
+    ].filter(Boolean)
+  )
+);
 const DEFAULT_LIVE_MODEL = process.env.GEMINI_LIVE_MODEL || 'gemini-3.8-live';
 const DEFAULT_LIVE_VOICE = process.env.GEMINI_LIVE_VOICE || 'Aoede';
 const MAX_CALL_SECONDS = Math.max(60, Math.min(600, parseInt(process.env.GEMINI_MAX_CALL_SECONDS || '240', 10) || 240));
@@ -117,73 +127,107 @@ router.post('/chat', async (req, res) => {
 
   try {
     const systemInstruction = await getPortfolioSystemInstruction('chat');
-    const ai = new GoogleGenAI({ apiKey });
+    // Disable slow SDK retry loops so a 503 spike fails over to the next healthy model immediately
+    const ai = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        timeout: 15000,
+        retryOptions: { attempts: 1 }
+      }
+    });
+
+    const safeHistory = Array.isArray(history)
+      ? history
+          .slice(-8)
+          .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+          .map((m) => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content.trim().slice(0, 1200) }]
+          }))
+      : [];
+
+    const contents = [
+      ...safeHistory,
+      { role: 'user', parts: [{ text: userMessage }] }
+    ];
 
     let interactionId = null;
     let streamedAnyText = false;
+    let lastError = null;
 
-    // Primary path: Gemini Interactions API (streaming, stateful via previous_interaction_id)
-    try {
-      const requestParams = {
-        model: DEFAULT_CHAT_MODEL,
-        system_instruction: systemInstruction,
-        input: userMessage,
-        stream: true,
-        store: true
-      };
-      if (typeof previousInteractionId === 'string' && previousInteractionId.trim()) {
-        requestParams.previous_interaction_id = previousInteractionId.trim();
+    // Fast multi-model failover chain: try fastest models first and switch immediately on 503/429
+    for (let i = 0; i < CHAT_MODEL_CHAIN.length && !streamedAnyText; i++) {
+      const model = CHAT_MODEL_CHAIN[i];
+
+      // 1. Try Gemini Interactions API on primary model first (supports stateful previous_interaction_id)
+      if (i === 0) {
+        try {
+          const requestParams = {
+            model,
+            system_instruction: systemInstruction,
+            input: userMessage,
+            stream: true,
+            store: true
+          };
+          if (typeof previousInteractionId === 'string' && previousInteractionId.trim()) {
+            requestParams.previous_interaction_id = previousInteractionId.trim();
+          }
+
+          const stream = await ai.interactions.create(requestParams, {
+            maxRetries: 0,
+            timeout: 12000
+          });
+          for await (const event of stream) {
+            if (event?.interaction?.id) {
+              interactionId = event.interaction.id;
+            }
+            if (event?.event_type === 'step.delta' && event?.delta?.type === 'text' && event?.delta?.text) {
+              streamedAnyText = true;
+              sendEvent({ type: 'delta', text: event.delta.text });
+            }
+          }
+          if (streamedAnyText) break;
+        } catch (interactionsErr) {
+          lastError = interactionsErr;
+          console.warn(`[AI Chat] Interactions API (${model}) unavailable, failing over fast:`, interactionsErr?.message || interactionsErr);
+          if (streamedAnyText) break;
+        }
       }
 
-      const stream = await ai.interactions.create(requestParams);
-      for await (const event of stream) {
-        if (event?.interaction?.id) {
-          interactionId = event.interaction.id;
-        }
-        if (event?.event_type === 'step.delta' && event?.delta?.type === 'text' && event?.delta?.text) {
-          streamedAnyText = true;
-          sendEvent({ type: 'delta', text: event.delta.text });
-        }
-      }
-    } catch (interactionsErr) {
-      // Graceful fallback to models.generateContentStream if Interactions API or previous_interaction_id fails
-      console.warn('[AI Chat] Interactions API fallback triggered:', interactionsErr?.message || interactionsErr);
+      // 2. Fast streaming fallback across healthy model pools via generateContentStream
+      try {
+        const fallbackStream = await ai.models.generateContentStream({
+          model,
+          contents,
+          config: {
+            systemInstruction,
+            temperature: 0.6,
+            maxOutputTokens: 650
+          }
+        });
 
-      const safeHistory = Array.isArray(history)
-        ? history
-            .slice(-10)
-            .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-            .map((m) => ({
-              role: m.role === 'assistant' ? 'model' : 'user',
-              parts: [{ text: m.content.trim().slice(0, 1500) }]
-            }))
-        : [];
-
-      const contents = [
-        ...safeHistory,
-        { role: 'user', parts: [{ text: userMessage }] }
-      ];
-
-      const fallbackStream = await ai.models.generateContentStream({
-        model: DEFAULT_CHAT_MODEL,
-        contents,
-        config: {
-          systemInstruction,
-          temperature: 0.6,
-          maxOutputTokens: 700
+        for await (const chunk of fallbackStream) {
+          const text = chunk?.text;
+          if (text) {
+            streamedAnyText = true;
+            sendEvent({ type: 'delta', text });
+          }
         }
-      });
-
-      for await (const chunk of fallbackStream) {
-        const text = chunk?.text;
-        if (text) {
-          streamedAnyText = true;
-          sendEvent({ type: 'delta', text });
+        if (streamedAnyText) {
+          interactionId = null;
+          break;
         }
+      } catch (modelErr) {
+        lastError = modelErr;
+        console.warn(`[AI Chat] Model ${model} failed, trying next model:`, modelErr?.message || modelErr);
+        if (streamedAnyText) break;
       }
     }
 
     if (!streamedAnyText) {
+      if (lastError) {
+        throw lastError;
+      }
       sendEvent({
         type: 'delta',
         text: "I'm here to help with anything about Caleb's portfolio, projects, skills, source code store, or how to get in touch. What would you like to know?"
