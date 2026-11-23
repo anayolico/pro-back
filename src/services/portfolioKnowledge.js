@@ -191,36 +191,43 @@ The portfolio features an ambient music player in the bottom-right corner with t
 const LIVE_LANGUAGES = {
   english: {
     label: 'English',
+    greeting: 'Welcome the caller warmly in English (e.g. "Hi! Welcome to CaleByte\'s portfolio — I\'m CaleByte AI. How can I help you today?").',
     directive:
       'Speak ONLY in clear, natural, warm English. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
   },
   pidgin: {
     label: 'Nigerian Pidgin',
+    greeting: 'Welcome the caller warmly in natural Nigerian Pidgin (e.g. "How far! Welcome to CaleByte portfolio, na me be CaleByte AI. Wetin you wan know about Caleb work today?").',
     directive:
       'Speak ONLY in natural, warm, friendly, and respectful Nigerian Pidgin English (the way everyday Nigerian tech professionals speak Pidgin — e.g. "How far!", "No wahala", "Caleb sabi build..."). Keep technical terms like React, Node.js, FastAPI, Paystack, and project names clear. NEVER switch out of Nigerian Pidgin into Spanish or another language due to background noise.'
   },
   igbo: {
     label: 'Igbo',
+    greeting: 'Welcome the caller warmly in natural polite Igbo (starting with "Nnọọ!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
       'Speak ONLY in clear, natural, polite Igbo (with common technical terms and project names pronounced clearly). NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   yoruba: {
     label: 'Yoruba',
+    greeting: 'Welcome the caller warmly in respectful Yoruba (starting with "Ẹ káàbọ̀!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
       'Speak ONLY in clear, natural, respectful Yoruba (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   hausa: {
     label: 'Hausa',
+    greeting: 'Welcome the caller warmly in polite Hausa (starting with "Barka da zuwa!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
       'Speak ONLY in clear, natural, polite Hausa (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   french: {
     label: 'French',
+    greeting: 'Welcome the caller warmly in natural French (e.g. "Bonjour et bienvenue sur le portfolio de CaleByte ! Je suis CaleByte AI, comment puis-je vous aider aujourd\'hui ?").',
     directive:
       'Speak ONLY in clear, natural, friendly French. NEVER switch into another language due to background noise.'
   },
   spanish: {
     label: 'Spanish',
+    greeting: 'Welcome the caller warmly in natural Spanish (e.g. "¡Hola y bienvenido al portafolio de CaleByte! Soy CaleByte AI, ¿en qué puedo ayudarte hoy?").',
     directive:
       'Speak ONLY in clear, natural, friendly Spanish. NEVER switch into another language due to background noise.'
   }
@@ -244,6 +251,9 @@ STRICT LANGUAGE RULE (HIGHEST PRIORITY):
 - Selected Call Language: ${langCfg.label}
 - ${langCfg.directive}
 - If you hear faint room noise, static, coughing, or unintelligible syllables, IGNORE them silently or briefly ask the visitor to repeat in ${langCfg.label}. NEVER guess or switch to another language.
+
+OPENING GREETING RULE:
+- When notified that a visitor just joined the call, immediately greet them in 1 to 2 short, warm sentences: ${langCfg.greeting}
 
 VOICE STYLE RULES:
 - Speak naturally, warmly, confidently, and concisely — like a helpful human teammate on a live call.
