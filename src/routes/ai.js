@@ -1,6 +1,10 @@
 const express = require('express');
 const { GoogleGenAI } = require('@google/genai');
-const { getPortfolioSystemInstruction, normalizeLiveLanguage } = require('../services/portfolioKnowledge');
+const {
+  getPortfolioSystemInstruction,
+  normalizeLiveLanguage,
+  getLiveVoiceForLanguage
+} = require('../services/portfolioKnowledge');
 const { getSetting, setSetting } = require('../db');
 const { authenticateToken } = require('./auth');
 const { broadcastUpdate } = require('../sse');
@@ -272,6 +276,7 @@ router.post('/live-token', async (req, res) => {
 
   try {
     const selectedLanguage = normalizeLiveLanguage(req.body?.language);
+    const selectedVoice = getLiveVoiceForLanguage(selectedLanguage, DEFAULT_LIVE_VOICE);
     const voiceInstruction = await getPortfolioSystemInstruction('voice', selectedLanguage);
     const expireTime = new Date(Date.now() + (MAX_CALL_SECONDS + 120) * 1000).toISOString();
     const newSessionExpireTime = new Date(Date.now() + 90 * 1000).toISOString();
@@ -296,7 +301,7 @@ router.post('/live-token', async (req, res) => {
             speechConfig: {
               voiceConfig: {
                 prebuiltVoiceConfig: {
-                  voiceName: DEFAULT_LIVE_VOICE
+                  voiceName: selectedVoice
                 }
               }
             }
@@ -312,7 +317,7 @@ router.post('/live-token', async (req, res) => {
     return res.json({
       token: tokenResp.name,
       model: DEFAULT_LIVE_MODEL,
-      voice: DEFAULT_LIVE_VOICE,
+      voice: selectedVoice,
       language: selectedLanguage,
       maxCallSeconds: MAX_CALL_SECONDS,
       expiresAt: expireTime

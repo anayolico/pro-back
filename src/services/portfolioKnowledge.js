@@ -191,42 +191,49 @@ The portfolio features an ambient music player in the bottom-right corner with t
 const LIVE_LANGUAGES = {
   english: {
     label: 'English',
+    voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
     greeting: 'Welcome the caller warmly in English (e.g. "Hi! Welcome to CaleByte\'s portfolio — I\'m CaleByte AI. How can I help you today?").',
     directive:
       'Speak ONLY in clear, natural, warm English. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
   },
   pidgin: {
     label: 'Nigerian Pidgin',
-    greeting: 'Welcome the caller warmly in natural Nigerian Pidgin (e.g. "How far! Welcome to CaleByte portfolio, na me be CaleByte AI. Wetin you wan know about Caleb work today?").',
+    voice: 'Fenrir',
+    greeting: 'Welcome the caller warmly in natural Nigerian Pidgin with a genuine Nigerian accent (e.g. "How far! Welcome to CaleByte portfolio, na me be CaleByte AI. Wetin you wan know about Caleb work today?").',
     directive:
-      'Speak ONLY in natural, warm, friendly, and respectful Nigerian Pidgin English (the way everyday Nigerian tech professionals speak Pidgin — e.g. "How far!", "No wahala", "Caleb sabi build..."). Keep technical terms like React, Node.js, FastAPI, Paystack, and project names clear. NEVER switch out of Nigerian Pidgin into Spanish or another language due to background noise.'
+      'Speak ONLY in authentic, natural, warm, and respectful Nigerian Pidgin English with a genuine Nigerian (Lagos) accent and West African vocal rhythm — NOT an American or British accent. Pronounce everyday Nigerian expressions like "how far", "wahala", "sabi", "na", "abeg", "Naira", "Nigeria", and "Caleb" the way a real Nigerian speaks. Keep tech terms (React, Node.js, FastAPI, Paystack) clear. NEVER switch out of Nigerian Pidgin into Spanish or another language due to background noise.'
   },
   igbo: {
     label: 'Igbo',
-    greeting: 'Welcome the caller warmly in natural polite Igbo (starting with "Nnọọ!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    voice: 'Charon',
+    greeting: 'Welcome the caller warmly in natural polite Igbo with an authentic Nigerian Igbo accent (starting with "Nnọọ!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, polite Igbo (with common technical terms and project names pronounced clearly). NEVER switch into Spanish or another unrelated language due to background noise.'
+      'Speak ONLY in clear, natural, polite Igbo with authentic Nigerian Igbo vocal intonation, proper tonal rhythm, and a calm, steady pace — NOT a Western/American accent. Pronounce Igbo tonal words and Nigerian names (Caleb, Nigeria, Naira) naturally and clearly. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   yoruba: {
     label: 'Yoruba',
-    greeting: 'Welcome the caller warmly in respectful Yoruba (starting with "Ẹ káàbọ̀!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    voice: 'Charon',
+    greeting: 'Welcome the caller warmly in respectful Yoruba with an authentic Nigerian Yoruba accent (starting with "Ẹ káàbọ̀!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, respectful Yoruba (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
+      'Speak ONLY in clear, natural, respectful Yoruba with authentic Nigerian Yoruba vocal cadence, accurate tonal inflections, and a calm, clear pace — NOT a Western/American accent. Pronounce Yoruba words and Nigerian names (Caleb, Nigeria, Naira) naturally. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   hausa: {
     label: 'Hausa',
-    greeting: 'Welcome the caller warmly in polite Hausa (starting with "Barka da zuwa!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    voice: 'Charon',
+    greeting: 'Welcome the caller warmly in polite Hausa with an authentic Northern Nigerian Hausa accent (starting with "Barka da zuwa!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, polite Hausa (keeping technical terms and project names clear). NEVER switch into Spanish or another unrelated language due to background noise.'
+      'Speak ONLY in clear, natural, polite Hausa with authentic Nigerian Hausa vocal cadence, clear pronunciation, and a calm, steady pace — NOT a Western/American accent. Pronounce Hausa words and Nigerian names (Caleb, Nigeria, Naira) naturally. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
   },
   french: {
     label: 'French',
+    voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
     greeting: 'Welcome the caller warmly in natural French (e.g. "Bonjour et bienvenue sur le portfolio de CaleByte ! Je suis CaleByte AI, comment puis-je vous aider aujourd\'hui ?").',
     directive:
       'Speak ONLY in clear, natural, friendly French. NEVER switch into another language due to background noise.'
   },
   spanish: {
     label: 'Spanish',
+    voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
     greeting: 'Welcome the caller warmly in natural Spanish (e.g. "¡Hola y bienvenido al portafolio de CaleByte! Soy CaleByte AI, ¿en qué puedo ayudarte hoy?").',
     directive:
       'Speak ONLY in clear, natural, friendly Spanish. NEVER switch into another language due to background noise.'
@@ -236,6 +243,15 @@ const LIVE_LANGUAGES = {
 function normalizeLiveLanguage(lang) {
   const key = typeof lang === 'string' ? lang.trim().toLowerCase() : 'english';
   return LIVE_LANGUAGES[key] ? key : 'english';
+}
+
+function getLiveVoiceForLanguage(lang, defaultVoice = 'Aoede') {
+  const key = normalizeLiveLanguage(lang);
+  const cfg = LIVE_LANGUAGES[key];
+  if (cfg && cfg.voice) {
+    return (process.env.GEMINI_LIVE_VOICE_NG || '').trim() || cfg.voice;
+  }
+  return defaultVoice;
 }
 
 async function getPortfolioSystemInstruction(mode = 'chat', language = 'english') {
@@ -286,5 +302,6 @@ module.exports = {
   getPortfolioSystemInstruction,
   invalidateKnowledgeCache,
   normalizeLiveLanguage,
+  getLiveVoiceForLanguage,
   LIVE_LANGUAGES
 };
