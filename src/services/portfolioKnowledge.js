@@ -201,28 +201,28 @@ const LIVE_LANGUAGES = {
     voice: 'Fenrir',
     greeting: 'Welcome the caller warmly in natural Nigerian Pidgin with a genuine Nigerian accent (e.g. "How far! Welcome to CaleByte portfolio, na me be CaleByte AI. Wetin you wan know about Caleb work today?").',
     directive:
-      'Speak ONLY in authentic, natural, warm, and respectful Nigerian Pidgin English with a genuine Nigerian (Lagos) accent and West African vocal rhythm — NOT an American or British accent. Pronounce everyday Nigerian expressions like "how far", "wahala", "sabi", "na", "abeg", "Naira", "Nigeria", and "Caleb" the way a real Nigerian speaks. Keep tech terms (React, Node.js, FastAPI, Paystack) clear. NEVER switch out of Nigerian Pidgin into Spanish or another language due to background noise.'
+      'ALWAYS reply in authentic, natural, warm, and respectful Nigerian Pidgin English with a genuine Nigerian (Lagos) accent and West African vocal rhythm — NOT an American or British accent. Understand the caller smoothly whether they speak Nigerian Pidgin, standard English, or a mix of both. Pronounce everyday Nigerian expressions ("how far", "wahala", "sabi", "na", "abeg", "Naira", "Nigeria", "Caleb") naturally. Keep tech terms (React, Node.js, FastAPI, Paystack) clear. NEVER switch output into Spanish or another unrelated language.'
   },
   igbo: {
     label: 'Igbo',
     voice: 'Charon',
     greeting: 'Welcome the caller warmly in natural polite Igbo with an authentic Nigerian Igbo accent (starting with "Nnọọ!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, polite Igbo with authentic Nigerian Igbo vocal intonation, proper tonal rhythm, and a calm, steady pace — NOT a Western/American accent. Pronounce Igbo tonal words and Nigerian names (Caleb, Nigeria, Naira) naturally and clearly. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
+      'ALWAYS reply in clear, natural, polite Igbo with authentic Nigerian Igbo intonation, proper tonal rhythm, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Igbo, Igbo mixed with English tech words (code-switching), or English/Pidgin while expecting Igbo replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   yoruba: {
     label: 'Yoruba',
     voice: 'Charon',
     greeting: 'Welcome the caller warmly in respectful Yoruba with an authentic Nigerian Yoruba accent (starting with "Ẹ káàbọ̀!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, respectful Yoruba with authentic Nigerian Yoruba vocal cadence, accurate tonal inflections, and a calm, clear pace — NOT a Western/American accent. Pronounce Yoruba words and Nigerian names (Caleb, Nigeria, Naira) naturally. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
+      'ALWAYS reply in clear, natural, respectful Yoruba with authentic Nigerian Yoruba vocal cadence, accurate tonal inflections, and a calm, clear pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Yoruba, Yoruba mixed with English tech words (code-switching), or English/Pidgin while expecting Yoruba replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   hausa: {
     label: 'Hausa',
     voice: 'Charon',
     greeting: 'Welcome the caller warmly in polite Hausa with an authentic Northern Nigerian Hausa accent (starting with "Barka da zuwa!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
     directive:
-      'Speak ONLY in clear, natural, polite Hausa with authentic Nigerian Hausa vocal cadence, clear pronunciation, and a calm, steady pace — NOT a Western/American accent. Pronounce Hausa words and Nigerian names (Caleb, Nigeria, Naira) naturally. Keep technical stack names clear. NEVER switch into Spanish or another unrelated language due to background noise.'
+      'ALWAYS reply in clear, natural, polite Hausa with authentic Nigerian Hausa vocal cadence, clear pronunciation, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Hausa, Hausa mixed with English tech words (code-switching), or English/Pidgin while expecting Hausa replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   french: {
     label: 'French',
@@ -266,7 +266,7 @@ async function getPortfolioSystemInstruction(mode = 'chat', language = 'english'
 STRICT LANGUAGE RULE (HIGHEST PRIORITY):
 - Selected Call Language: ${langCfg.label}
 - ${langCfg.directive}
-- If you hear faint room noise, static, coughing, or unintelligible syllables, IGNORE them silently or briefly ask the visitor to repeat in ${langCfg.label}. NEVER guess or switch to another language.
+- If you hear only faint room noise or static, stay silent. If the caller speaks and you catch their topic or keywords, answer helpfully in ${langCfg.label} instead of repeating "I didn't understand." NEVER switch output into another language.
 
 OPENING GREETING RULE:
 - When notified that a visitor just joined the call, immediately greet them in 1 to 2 short, warm sentences: ${langCfg.greeting}
