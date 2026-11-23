@@ -18,6 +18,7 @@ const contactRouter = require('./routes/contact');
 const contentRouter = require('./routes/content');
 const uploadRouter = require('./routes/upload');
 const paymentRouter = require('./routes/payment');
+const aiRouter = require('./routes/ai');
 const { sseHandler } = require('./sse');
 
 const app = express();
@@ -100,6 +101,7 @@ app.use('/api/contact', contactRouter);
 app.use('/api/contacts', contactRouter); // Alias for compatibility
 app.use('/api/paystack', paymentRouter);
 app.use('/api/download', paymentRouter);
+app.use('/api/ai', aiRouter);
 app.use('/api', contentRouter);
 
 // Admin dashboard route redirect

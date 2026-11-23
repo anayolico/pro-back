@@ -1,7 +1,14 @@
 const express = require('express');
 const { getTableData, insertItem, updateItem, deleteItem, getCvData, updateCvData } = require('../db');
 const { authenticateToken } = require('./auth');
-const { broadcastUpdate } = require('../sse');
+const { broadcastUpdate: rawBroadcastUpdate } = require('../sse');
+const { invalidateKnowledgeCache } = require('../services/portfolioKnowledge');
+
+// Refresh both connected frontends (SSE) and the AI portfolio knowledge cache on any content change
+const broadcastUpdate = (payload) => {
+  invalidateKnowledgeCache();
+  rawBroadcastUpdate(payload);
+};
 
 const router = express.Router();
 
