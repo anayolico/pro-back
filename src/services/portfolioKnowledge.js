@@ -192,79 +192,72 @@ const LIVE_LANGUAGES = {
   english: {
     label: 'English',
     voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
+    envVoiceKey: 'GEMINI_LIVE_VOICE',
     greetings: {
       morning: 'Hello, good morning! Welcome to CaleByte Support. How can I help you today?',
       afternoon: 'Hello, good afternoon! Welcome to CaleByte Support. How can I help you today?',
       evening: 'Hello, good evening! Welcome to CaleByte Support. How can I help you today?'
     },
+    styleAnchors:
+      'Example tone: "Caleb builds scalable full-stack web apps, mobile apps, and backend APIs. His top projects include Nigeria SecureVote and LuminaConvert."',
     directive:
-      'Speak ONLY in clear, natural, warm English. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
+      'RESPOND IN ENGLISH. YOU MUST RESPOND UNMISTAKABLY IN CLEAR, NATURAL, WARM ENGLISH. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
   },
   pidgin: {
     label: 'Nigerian Pidgin',
-    voice: 'Fenrir',
+    voice: 'Achird',
+    envVoiceKey: 'GEMINI_LIVE_VOICE_PIDGIN',
     greetings: {
       morning: 'Hello, good morning! Welcome to CaleByte Support. How I fit help you today?',
       afternoon: 'Hello, good afternoon! Welcome to CaleByte Support. How I fit help you today?',
       evening: 'Hello, good evening! Welcome to CaleByte Support. How I fit help you today?'
     },
+    styleAnchors:
+      'Authentic rhythm examples: "No wahala at all! Caleb sabi build full-stack web apps, mobile apps, and solid backend APIs." / "If you wan support CaleByte, just tap the Support button on the site, e dey use Paystack."',
     directive:
-      'ALWAYS reply in authentic, natural, warm, and respectful Nigerian Pidgin English with a genuine Nigerian (Lagos) accent and West African vocal rhythm — NOT an American or British accent. Understand the caller smoothly whether they speak Nigerian Pidgin, standard English, or a mix of both. Pronounce everyday Nigerian expressions ("how far", "wahala", "sabi", "na", "abeg", "Naira", "Nigeria", "Caleb") naturally. Keep tech terms (React, Node.js, FastAPI, Paystack) clear. NEVER switch output into Spanish or another unrelated language.'
+      'RESPOND IN NIGERIAN PIDGIN. YOU MUST RESPOND UNMISTAKABLY IN AUTHENTIC NIGERIAN PIDGIN ENGLISH. Use a genuine Lagos/Nigerian syllable-timed West African vocal rhythm, soft non-rhotic endings, and natural Nigerian rising-to-level intonation — NOT an American or British accent. Use real natural Pidgin phrasing ("how far", "no wahala", "wey", "dey", "sabi", "na", "abeg", "Naira", "Nigeria") rather than stiff textbook English. Understand the caller smoothly whether they speak Pidgin, standard English, or a mix of both. Keep technical names (React, Node.js, FastAPI, Paystack) crisp. NEVER switch output into Spanish or another unrelated language.'
   },
   igbo: {
     label: 'Igbo',
-    voice: 'Charon',
+    voice: 'Schedar',
+    envVoiceKey: 'GEMINI_LIVE_VOICE_IGBO',
     greetings: {
       morning: 'Hello, ụtụtụ ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?',
       afternoon: 'Hello, ehihie ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?',
       evening: 'Hello, mgbede ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?'
     },
+    styleAnchors:
+      'Authentic Central Igbo phrasing examples: "Daalụ nke ukwuu! Caleb bụ ọkachamara n\'ịrụ webụsaịtị, ngwa ekwentị, na backend APIs." / "Ọ bụrụ na ị chọrọ ịkwado CaleByte, pịa bọtịnụ Support n\'elu saịtị a."',
     directive:
-      'ALWAYS reply in clear, natural, polite Igbo with authentic Nigerian Igbo intonation, proper tonal rhythm, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Igbo, Igbo mixed with English tech words (code-switching), or English/Pidgin while expecting Igbo replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
+      'RESPOND IN IGBO. YOU MUST RESPOND UNMISTAKABLY IN NATURAL, POLITE CENTRAL IGBO. Use a calm, steady Southeast Nigerian Igbo vocal cadence with crisp open vowels (ị, ọ, ụ) and accurate tonal pitch contours — NOT a Western/American accent. Use everyday spoken Igbo rather than stiff literal translations. Understand the caller smoothly whether they speak pure Igbo, Igbo mixed with English tech words (code-switching), or English/Pidgin while expecting Igbo replies. Use portfolio context generously rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   yoruba: {
     label: 'Yoruba',
-    voice: 'Charon',
+    voice: 'Schedar',
+    envVoiceKey: 'GEMINI_LIVE_VOICE_YORUBA',
     greetings: {
       morning: 'Hello, ẹ káàárọ̀! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?',
       afternoon: 'Hello, ẹ káàsán! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?',
       evening: 'Hello, ẹ káalẹ́! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?'
     },
+    styleAnchors:
+      'Authentic respectful Yoruba phrasing examples: "Ẹ ṣé púpọ̀! Caleb jẹ́ onímọ̀-ẹ̀rọ sọ́fítíwéà tó ń kọ́ àwọn ojú-òpó wẹ́ẹ̀bù àti àwọn ètò backend." / "Tí ẹ bá fẹ́ ṣe àtìlẹ́yìn fún CaleByte, ẹ lè tẹ bọ́tìnì Support lórí ojú-òpó yìí."',
     directive:
-      'ALWAYS reply in clear, natural, respectful Yoruba with authentic Nigerian Yoruba vocal cadence, accurate tonal inflections, and a calm, clear pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Yoruba, Yoruba mixed with English tech words (code-switching), or English/Pidgin while expecting Yoruba replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
+      'RESPOND IN YORUBA. YOU MUST RESPOND UNMISTAKABLY IN CLEAR, RESPECTFUL YORUBA. Use a calm Southwest Nigerian Yoruba vocal cadence with natural 3-tone musicality (high/mid/low), respectful honorifics (Ẹ káàárọ̀, Ẹ ṣé, Ẹ káàbọ̀), and unhurried clear pronunciation — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Yoruba, Yoruba mixed with English tech words (code-switching), or English/Pidgin while expecting Yoruba replies. Use portfolio context generously rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   hausa: {
     label: 'Hausa',
-    voice: 'Charon',
+    voice: 'Schedar',
+    envVoiceKey: 'GEMINI_LIVE_VOICE_HAUSA',
     greetings: {
       morning: 'Hello, barka da safiya! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?',
       afternoon: 'Hello, barka da rana! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?',
       evening: 'Hello, barka da yamma! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?'
     },
+    styleAnchors:
+      'Authentic polite Hausa phrasing examples: "Na gode sosai! Caleb ƙwararren injiniyan software ne da ke gina shafukan yanar gizo, manhajoji, da tsarin backend." / "Idan kuna son tallafawa CaleByte, ku danna maɓallin Support."',
     directive:
-      'ALWAYS reply in clear, natural, polite Hausa with authentic Nigerian Hausa vocal cadence, clear pronunciation, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Hausa, Hausa mixed with English tech words (code-switching), or English/Pidgin while expecting Hausa replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
-  },
-  french: {
-    label: 'French',
-    voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
-    greetings: {
-      morning: 'Bonjour ! Bienvenue chez CaleByte Support. Comment puis-je vous aider aujourd\'hui ?',
-      afternoon: 'Bonjour ! Bienvenue chez CaleByte Support. Comment puis-je vous aider aujourd\'hui ?',
-      evening: 'Bonsoir ! Bienvenue chez CaleByte Support. Comment puis-je vous aider ?'
-    },
-    directive:
-      'Speak ONLY in clear, natural, friendly French. NEVER switch into another language due to background noise.'
-  },
-  spanish: {
-    label: 'Spanish',
-    voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
-    greetings: {
-      morning: '¡Hola, buenos días! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?',
-      afternoon: '¡Hola, buenas tardes! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?',
-      evening: '¡Hola, buenas noches! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?'
-    },
-    directive:
-      'Speak ONLY in clear, natural, friendly Spanish. NEVER switch into another language due to background noise.'
+      'RESPOND IN HAUSA. YOU MUST RESPOND UNMISTAKABLY IN CLEAR, POLITE HAUSA. Use a calm, natural Northern Nigerian Hausa vocal cadence and smooth steady pacing — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Hausa, Hausa mixed with English tech words (code-switching), or English/Pidgin while expecting Hausa replies. Use portfolio context generously rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   }
 };
 
@@ -282,6 +275,9 @@ function normalizeTimeOfDay(timeOfDay) {
 function getLiveVoiceForLanguage(lang, defaultVoice = 'Aoede') {
   const key = normalizeLiveLanguage(lang);
   const cfg = LIVE_LANGUAGES[key];
+  if (cfg && cfg.envVoiceKey && process.env[cfg.envVoiceKey] && process.env[cfg.envVoiceKey].trim()) {
+    return process.env[cfg.envVoiceKey].trim();
+  }
   if (cfg && cfg.voice) {
     return (process.env.GEMINI_LIVE_VOICE_NG || '').trim() || cfg.voice;
   }
@@ -299,10 +295,11 @@ async function getPortfolioSystemInstruction(mode = 'chat', language = 'english'
 
     return `You are CaleByte Support, the live voice support desk on Caleb Anayolico's (CaleByte) official portfolio website. Do NOT call yourself an AI or say "CaleByte AI" during the call — speak naturally as CaleByte Support.
 
-STRICT LANGUAGE RULE (HIGHEST PRIORITY):
+STRICT LANGUAGE & ACCENT RULE (HIGHEST PRIORITY):
 - Selected Call Language: ${langCfg.label}
 - Caller's Local Time of Day: ${todKey}
 - ${langCfg.directive}
+- ${langCfg.styleAnchors}
 - If you hear only faint room noise or static, stay silent. If the caller speaks and you catch their topic or keywords, answer helpfully in ${langCfg.label} instead of repeating "I didn't understand." NEVER switch output into another language.
 
 OPENING GREETING RULE:
