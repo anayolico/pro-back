@@ -89,14 +89,14 @@ router.post('/chat', async (req, res) => {
   const enabled = Boolean(await getSetting('ai_assistant_enabled', true));
   if (!enabled) {
     return res.status(403).json({
-      error: 'CaleByte AI is currently turned off by the site administrator.'
+      error: 'CaleByte Support is currently turned off by the site administrator.'
     });
   }
 
   const apiKey = getApiKey();
   if (!apiKey) {
     return res.status(503).json({
-      error: 'CaleByte AI is not configured yet. Please add GEMINI_API_KEY on the backend server.'
+      error: 'CaleByte Support is not configured yet. Please add GEMINI_API_KEY on the backend server.'
     });
   }
 
@@ -245,7 +245,7 @@ router.post('/chat', async (req, res) => {
     console.error('[AI Chat Error]', err?.message || err);
     sendEvent({
       type: 'error',
-      error: 'Unable to reach CaleByte AI right now. Please try again in a moment.'
+      error: 'Unable to reach CaleByte Support right now. Please try again in a moment.'
     });
     res.end();
   }
@@ -256,7 +256,7 @@ router.post('/live-token', async (req, res) => {
   const enabled = Boolean(await getSetting('ai_assistant_enabled', true));
   if (!enabled) {
     return res.status(403).json({
-      error: 'CaleByte AI Live Call is currently turned off by the site administrator.'
+      error: 'CaleByte Support Live Call is currently turned off by the site administrator.'
     });
   }
 
