@@ -192,49 +192,77 @@ const LIVE_LANGUAGES = {
   english: {
     label: 'English',
     voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
-    greeting: 'Welcome the caller warmly in English (e.g. "Hi! Welcome to CaleByte\'s portfolio — I\'m CaleByte AI. How can I help you today?").',
+    greetings: {
+      morning: 'Hello, good morning! Welcome to CaleByte Support. How can I help you today?',
+      afternoon: 'Hello, good afternoon! Welcome to CaleByte Support. How can I help you today?',
+      evening: 'Hello, good evening! Welcome to CaleByte Support. How can I help you today?'
+    },
     directive:
       'Speak ONLY in clear, natural, warm English. Do NOT switch to Spanish, French, or any other language even if you hear faint background noise, breaths, or unclear sounds.'
   },
   pidgin: {
     label: 'Nigerian Pidgin',
     voice: 'Fenrir',
-    greeting: 'Welcome the caller warmly in natural Nigerian Pidgin with a genuine Nigerian accent (e.g. "How far! Welcome to CaleByte portfolio, na me be CaleByte AI. Wetin you wan know about Caleb work today?").',
+    greetings: {
+      morning: 'Hello, good morning! Welcome to CaleByte Support. How I fit help you today?',
+      afternoon: 'Hello, good afternoon! Welcome to CaleByte Support. How I fit help you today?',
+      evening: 'Hello, good evening! Welcome to CaleByte Support. How I fit help you today?'
+    },
     directive:
       'ALWAYS reply in authentic, natural, warm, and respectful Nigerian Pidgin English with a genuine Nigerian (Lagos) accent and West African vocal rhythm — NOT an American or British accent. Understand the caller smoothly whether they speak Nigerian Pidgin, standard English, or a mix of both. Pronounce everyday Nigerian expressions ("how far", "wahala", "sabi", "na", "abeg", "Naira", "Nigeria", "Caleb") naturally. Keep tech terms (React, Node.js, FastAPI, Paystack) clear. NEVER switch output into Spanish or another unrelated language.'
   },
   igbo: {
     label: 'Igbo',
     voice: 'Charon',
-    greeting: 'Welcome the caller warmly in natural polite Igbo with an authentic Nigerian Igbo accent (starting with "Nnọọ!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    greetings: {
+      morning: 'Hello, ụtụtụ ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?',
+      afternoon: 'Hello, ehihie ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?',
+      evening: 'Hello, mgbede ọma! Nnọọ na CaleByte Support. Kedu ka m ga-esi nyere gị aka?'
+    },
     directive:
       'ALWAYS reply in clear, natural, polite Igbo with authentic Nigerian Igbo intonation, proper tonal rhythm, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Igbo, Igbo mixed with English tech words (code-switching), or English/Pidgin while expecting Igbo replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   yoruba: {
     label: 'Yoruba',
     voice: 'Charon',
-    greeting: 'Welcome the caller warmly in respectful Yoruba with an authentic Nigerian Yoruba accent (starting with "Ẹ káàbọ̀!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    greetings: {
+      morning: 'Hello, ẹ káàárọ̀! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?',
+      afternoon: 'Hello, ẹ káàsán! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?',
+      evening: 'Hello, ẹ káalẹ́! Ẹ káàbọ̀ sí CaleByte Support. Báwo ni mo ṣe lè ràn yín lọ́wọ́?'
+    },
     directive:
       'ALWAYS reply in clear, natural, respectful Yoruba with authentic Nigerian Yoruba vocal cadence, accurate tonal inflections, and a calm, clear pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Yoruba, Yoruba mixed with English tech words (code-switching), or English/Pidgin while expecting Yoruba replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   hausa: {
     label: 'Hausa',
     voice: 'Charon',
-    greeting: 'Welcome the caller warmly in polite Hausa with an authentic Northern Nigerian Hausa accent (starting with "Barka da zuwa!"), introducing yourself as CaleByte AI on Caleb\'s portfolio and asking how you can help.',
+    greetings: {
+      morning: 'Hello, barka da safiya! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?',
+      afternoon: 'Hello, barka da rana! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?',
+      evening: 'Hello, barka da yamma! Barka da zuwa CaleByte Support. Yaya zan iya taimaka muku?'
+    },
     directive:
       'ALWAYS reply in clear, natural, polite Hausa with authentic Nigerian Hausa vocal cadence, clear pronunciation, and a calm, steady pace — NOT a Western/American accent. Understand the caller smoothly whether they speak pure Hausa, Hausa mixed with English tech words (code-switching), or English/Pidgin while expecting Hausa replies. Use portfolio context generously to understand their intent rather than repeatedly asking them to repeat themselves. NEVER switch output into Spanish or another unrelated language.'
   },
   french: {
     label: 'French',
     voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
-    greeting: 'Welcome the caller warmly in natural French (e.g. "Bonjour et bienvenue sur le portfolio de CaleByte ! Je suis CaleByte AI, comment puis-je vous aider aujourd\'hui ?").',
+    greetings: {
+      morning: 'Bonjour ! Bienvenue chez CaleByte Support. Comment puis-je vous aider aujourd\'hui ?',
+      afternoon: 'Bonjour ! Bienvenue chez CaleByte Support. Comment puis-je vous aider aujourd\'hui ?',
+      evening: 'Bonsoir ! Bienvenue chez CaleByte Support. Comment puis-je vous aider ?'
+    },
     directive:
       'Speak ONLY in clear, natural, friendly French. NEVER switch into another language due to background noise.'
   },
   spanish: {
     label: 'Spanish',
     voice: null, // Uses DEFAULT_LIVE_VOICE (e.g. Aoede)
-    greeting: 'Welcome the caller warmly in natural Spanish (e.g. "¡Hola y bienvenido al portafolio de CaleByte! Soy CaleByte AI, ¿en qué puedo ayudarte hoy?").',
+    greetings: {
+      morning: '¡Hola, buenos días! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?',
+      afternoon: '¡Hola, buenas tardes! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?',
+      evening: '¡Hola, buenas noches! Bienvenido a CaleByte Support. ¿En qué puedo ayudarte hoy?'
+    },
     directive:
       'Speak ONLY in clear, natural, friendly Spanish. NEVER switch into another language due to background noise.'
   }
@@ -243,6 +271,12 @@ const LIVE_LANGUAGES = {
 function normalizeLiveLanguage(lang) {
   const key = typeof lang === 'string' ? lang.trim().toLowerCase() : 'english';
   return LIVE_LANGUAGES[key] ? key : 'english';
+}
+
+function normalizeTimeOfDay(timeOfDay) {
+  const key = typeof timeOfDay === 'string' ? timeOfDay.trim().toLowerCase() : '';
+  if (key === 'morning' || key === 'afternoon' || key === 'evening') return key;
+  return 'morning';
 }
 
 function getLiveVoiceForLanguage(lang, defaultVoice = 'Aoede') {
@@ -254,30 +288,33 @@ function getLiveVoiceForLanguage(lang, defaultVoice = 'Aoede') {
   return defaultVoice;
 }
 
-async function getPortfolioSystemInstruction(mode = 'chat', language = 'english') {
+async function getPortfolioSystemInstruction(mode = 'chat', language = 'english', timeOfDay = 'morning') {
   const knowledge = await buildPortfolioSnapshot();
 
   if (mode === 'voice') {
     const langKey = normalizeLiveLanguage(language);
+    const todKey = normalizeTimeOfDay(timeOfDay);
     const langCfg = LIVE_LANGUAGES[langKey];
+    const greetingLine = langCfg.greetings[todKey] || langCfg.greetings.morning;
 
-    return `You are CaleByte AI, the official real-time voice assistant on Caleb Anayolico's (CaleByte) developer portfolio website.
+    return `You are CaleByte Support, the live voice support desk on Caleb Anayolico's (CaleByte) official portfolio website. Do NOT call yourself an AI or say "CaleByte AI" during the call — speak naturally as CaleByte Support.
 
 STRICT LANGUAGE RULE (HIGHEST PRIORITY):
 - Selected Call Language: ${langCfg.label}
+- Caller's Local Time of Day: ${todKey}
 - ${langCfg.directive}
 - If you hear only faint room noise or static, stay silent. If the caller speaks and you catch their topic or keywords, answer helpfully in ${langCfg.label} instead of repeating "I didn't understand." NEVER switch output into another language.
 
 OPENING GREETING RULE:
-- When notified that a visitor just joined the call, immediately greet them in 1 to 2 short, warm sentences: ${langCfg.greeting}
+- When notified that a caller just connected, immediately answer the call warmly using this greeting in ${langCfg.label}: "${greetingLine}"
 
 VOICE STYLE RULES:
-- Speak naturally, warmly, confidently, and concisely — like a helpful human teammate on a live call.
-- Keep spoken answers short and conversational (typically 2 to 4 sentences) unless the visitor specifically asks for a deeper technical breakdown.
+- Speak naturally, warmly, confidently, and concisely — like a helpful live support representative on a phone call.
+- Keep spoken answers short and conversational (typically 2 to 4 sentences) unless the caller specifically asks for a deeper technical breakdown.
 - Do NOT read raw URLs, markdown symbols, asterisks, or bullet syntax aloud. Refer to pages naturally (e.g., the Projects page, the Source Code Store, the CV page, or the Support button).
-- Answer accurately using ONLY the live portfolio knowledge below. If something is not listed, be honest and invite the visitor to contact Caleb directly via the Contact form, email, or WhatsApp.
-- If a visitor asks how to support Caleb, explain the Paystack Support option (presets from 2,000 to 20,000 Naira or any custom amount from 100 Naira), buying premium source code packages, or hiring/collaborating with him.
-- Start warmly if greeted and always stay helpful, respectful, and focused on Caleb / CaleByte's portfolio, services, projects, skills, store, and contact options.
+- Answer accurately using ONLY the live portfolio knowledge below. If something is not listed, be honest and invite the caller to contact Caleb directly via the Contact form, email, or WhatsApp.
+- If a caller asks how to support Caleb, explain the Paystack Support option (presets from 2,000 to 20,000 Naira or any custom amount from 100 Naira), buying premium source code packages, or hiring/collaborating with him.
+- Always stay helpful, respectful, and focused on Caleb / CaleByte's portfolio, services, projects, skills, store, and contact options.
 
 LIVE PORTFOLIO KNOWLEDGE:
 ${knowledge}`;
@@ -302,6 +339,7 @@ module.exports = {
   getPortfolioSystemInstruction,
   invalidateKnowledgeCache,
   normalizeLiveLanguage,
+  normalizeTimeOfDay,
   getLiveVoiceForLanguage,
   LIVE_LANGUAGES
 };

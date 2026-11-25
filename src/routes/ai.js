@@ -3,6 +3,7 @@ const { GoogleGenAI } = require('@google/genai');
 const {
   getPortfolioSystemInstruction,
   normalizeLiveLanguage,
+  normalizeTimeOfDay,
   getLiveVoiceForLanguage
 } = require('../services/portfolioKnowledge');
 const { getSetting, setSetting } = require('../db');
@@ -276,8 +277,9 @@ router.post('/live-token', async (req, res) => {
 
   try {
     const selectedLanguage = normalizeLiveLanguage(req.body?.language);
+    const selectedTimeOfDay = normalizeTimeOfDay(req.body?.timeOfDay);
     const selectedVoice = getLiveVoiceForLanguage(selectedLanguage, DEFAULT_LIVE_VOICE);
-    const voiceInstruction = await getPortfolioSystemInstruction('voice', selectedLanguage);
+    const voiceInstruction = await getPortfolioSystemInstruction('voice', selectedLanguage, selectedTimeOfDay);
     const expireTime = new Date(Date.now() + (MAX_CALL_SECONDS + 120) * 1000).toISOString();
     const newSessionExpireTime = new Date(Date.now() + 90 * 1000).toISOString();
 
